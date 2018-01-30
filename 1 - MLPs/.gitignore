@@ -1,0 +1,4 @@
+*.gz
+*.pkl
+.idea/
+.ipynb_checkpoints/
