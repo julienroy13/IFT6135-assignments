@@ -1,4 +1,5 @@
 import collections
+import os
 
 class CarefulDict(dict):
     def __init__(self, inp=None):
@@ -24,12 +25,17 @@ class CarefulDict(dict):
             super(CarefulDict, self).__setitem__(k, v)
 
 
-configs = (CarefulDict([
+myConfigs = (CarefulDict([
     
-    (0, # Small Example SC config (mini HDM05)
-    {"layers": [512, 128],
-     "activation": "relu", # "relu", "sigmoid"
-     "save_plots":True
-     }),
+    (0, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "layers": [512, 128],
+        "activation": "relu", # "relu", "sigmoid"
+        "initialization": "glorot", # "glorot", "zero", "normal"
+        "mb_size": 64,
+        "max_epochs": 1000,
+        "save_plots":True
+        }
+     ),
 
 ]))

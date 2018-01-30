@@ -1,16 +1,14 @@
-import torch
-from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
 
 class MLP(nn.Module):
 
-    def __init__(self, h_sizes):
+    def __init__(self, inp_size, h_sizes, out_size):
 
         super(MLP, self).__init__()
 
         # Input layer
-        self.inp = nn.linear(28*28, h_sizes[0])
+        self.inp = nn.Linear(inp_size, h_sizes[0])
 
         # Hidden layers
         self.hidden = []
@@ -18,7 +16,7 @@ class MLP(nn.Module):
             self.hidden.append(nn.Linear(h_sizes[k], h_sizes[k+1]))
 
         # Output layer
-        self.out = nn.Linear(h_sizes[-1], 10)
+        self.out = nn.Linear(h_sizes[-1], out_size)
 
     def forward(self, x, y):
 
