@@ -11,7 +11,7 @@ import argparse
 
 import numpy as np
 
-torch.initial_seed(1234)
+torch.manual_seed(1234)
 
 def train_model(config, config_number, gpu_id):
 
