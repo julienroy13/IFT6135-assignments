@@ -39,12 +39,13 @@ def create_minibatches(train_data, train_labels, mb_size):
 
     return minibatches
 
+
 def save_model(model):
 
-    # TODO
+    pass # TODO
     return
 
 def save_results():
 
-    # TODO
+    pass # TODO
     return

@@ -29,11 +29,15 @@ myConfigs = (CarefulDict([
     
     (0, {
         "data_file": os.path.join("data", "mnist_data.pkl"),
-        "layers": [512, 128],
+        "hidden_layers": [512, 128],
         "activation": "relu", # "relu", "sigmoid"
         "initialization": "glorot", # "glorot", "zero", "normal"
         "mb_size": 64,
-        "max_epochs": 1000,
+        "max_epochs": 10,
+
+        "lr": 0.01,
+        "momentum": 0.9,
+
         "save_plots":True
         }
      ),
