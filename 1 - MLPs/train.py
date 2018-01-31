@@ -1,5 +1,7 @@
 import torch
 import torch.nn as nn
+import torch.utils.data
+import torch.nn.functional as F
 from torch.autograd import Variable
 import torch.optim as optim
 import utils
@@ -22,27 +24,27 @@ def train_model(config, config_number, gpu_id):
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
 
     # If GPU is available, sends model and dataset on the GPU
-    if torch.cuda.is_available():
-        model.cuda(gpu_id)
+    if False and torch.cuda.is_available():
+        model.cuda()
 
-        x_train = Variable(torch.from_numpy(x_train)).cuda(gpu_id)
-        y_train = Variable(torch.from_numpy(y_train)).cuda(gpu_id)
+        x_train = torch.from_numpy(x_train).cuda(gpu_id)
+        y_train = torch.from_numpy(y_train).cuda(gpu_id)
 
-        x_valid = Variable(torch.from_numpy(x_valid)).cuda(gpu_id)
-        y_valid = Variable(torch.from_numpy(y_valid)).cuda(gpu_id)
+        x_valid = torch.from_numpy(x_valid).cuda(gpu_id)
+        y_valid = torch.from_numpy(y_valid).cuda(gpu_id)
 
-        x_test = Variable(torch.from_numpy(x_test)).cuda(gpu_id)
-        y_test = Variable(torch.from_numpy(y_test)).cuda(gpu_id)
+        x_test = torch.from_numpy(x_test).cuda(gpu_id)
+        y_test = torch.from_numpy(y_test).cuda(gpu_id)
         print("Running on GPU")
     else:
-        x_train = Variable(torch.from_numpy(x_train))
-        y_train = Variable(torch.from_numpy(y_train))
+        x_train = torch.from_numpy(x_train)
+        y_train = torch.from_numpy(y_train)
 
-        x_valid = Variable(torch.from_numpy(x_valid))
-        y_valid = Variable(torch.from_numpy(y_valid))
+        x_valid = torch.from_numpy(x_valid)
+        y_valid = torch.from_numpy(y_valid)
 
-        x_test = Variable(torch.from_numpy(x_test))
-        y_test = Variable(torch.from_numpy(y_test))
+        x_test = torch.from_numpy(x_test)
+        y_test = torch.from_numpy(y_test)
         print("WATCH-OUT : torch.cuda.is_available() returned False. Running on CPU.")
 
     # Instantiate TensorDataset and DataLoader objects
@@ -54,8 +56,7 @@ def train_model(config, config_number, gpu_id):
     loss_fn = nn.CrossEntropyLoss()
 
     # TRAINING LOOP
-    for epoch in range(config("max_epochs")):
-
+    for epoch in range(config["max_epochs"]):
         for x_batch, y_batch in loader:
 
             # Empties the gradients
@@ -97,8 +98,7 @@ if __name__ == "__main__":
     # Retrieves arguments from the command line
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--config', type=int, required=True,
-                        choices=['mnist', '20documents'],
+    parser.add_argument('--config', type=str, required=True,
                         help='config id number')
 
     parser.add_argument('--gpu', type=str, default='0',
@@ -108,9 +108,10 @@ if __name__ == "__main__":
     print(args)
 
     # Extracts the chosen config
-    config_number = args.config
+    config_number = int(args.config)
     config = myConfigs[config_number]
+    gpu_id = int(args.gpu)
 
     # Runs the training procedure
     print("Running the training procedure for config-{}".format(config_number))
-    train_model(config, config_number)
+    train_model(config, config_number, gpu_id)

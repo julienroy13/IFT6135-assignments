@@ -3,7 +3,7 @@ import pickle
 
 def load_mnist(data_file):
 
-    with open("mnist_data.pkl", "rb") as f:
+    with open(data_file, "rb") as f:
         mnist = pickle.load(f)
 
     x_train = mnist['x_train']
