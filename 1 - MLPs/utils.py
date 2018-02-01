@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import matplotlib.pyplot as plt
 
 def load_mnist(data_file):
 
@@ -18,26 +19,16 @@ def load_mnist(data_file):
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
 
-def create_minibatches(train_data, train_labels, mb_size):
-    """
-    :param train_data: the whole tensor of training examples
-    :param train_labels: the whole tensor of training labels
-    :param mb_size: the size of each minibatch
-    :return: a list of tuples containing the minibatches (train_data, train_labels)
-    """
+def reduce_trainset_size(x_train, y_train, reduction_coeff):
+
     rdm_state = np.random.get_state()
-    np.random.shuffle(train_data)
+    np.random.shuffle(x_train)
     np.random.set_state(rdm_state)
-    np.random.shuffle(train_labels)
+    np.random.shuffle(y_train)
 
-    minibatches = []
+    limit = int(reduction_coeff * 50000)
 
-    for i in range(int(np.ceil(train_data.shape[0] / mb_size))):
-
-        minibatches.append((train_data[i*mb_size, i*mb_size + mb_size],
-                            train_labels[i*mb_size, i*mb_size + mb_size]))
-
-    return minibatches
+    return x_train[:limit], y_train[:limit]
 
 
 def save_model(model):

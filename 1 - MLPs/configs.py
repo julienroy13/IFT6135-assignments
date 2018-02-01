@@ -29,6 +29,7 @@ myConfigs = (CarefulDict([
     
     (0, {
         "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0, # 0.01, 0.02, 0.05, 0.1, 1.0
         
         "hidden_layers": [512, 128],
         "activation": "relu", # "relu", "sigmoid"
@@ -40,7 +41,7 @@ myConfigs = (CarefulDict([
         "lr": 0.01,
         "momentum": 0.9,
 
-        "save_plots":True
+        "save_plots": True
         }
      ),
 

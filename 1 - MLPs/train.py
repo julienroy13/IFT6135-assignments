@@ -10,25 +10,43 @@ from model import MLP
 from configs import myConfigs
 import os
 import argparse
+import math
+from termcolor import cprint
 
 import numpy as np
 
 torch.manual_seed(1234)
 
-def train_model(config, config_number, gpu_id):
 
+def train_model(config, config_number, gpu_id):
     # Instantiating the model
     model = MLP(784, config["hidden_layers"], 10, act_fn=config["activation"])
 
-    # Initializes the parameters    
+    # Initializes the parameters
     for module in model.modules():
         if isinstance(module, nn.Linear):
             print(module)
-            #torch.nn.init.xavier_uniform(module.weight.data, gain=nn.init.calculate_gain(config['activation']))
-            #module.bias.data.fill_(0.)
+            module.bias.data.fill_(0.)
+
+            if config['initialization'] == "zero":
+                module.weight.data.fill_(0.)
+
+            elif config['initialization'] == "normal":
+                module.weight.data.normal_(0., 1.)
+
+            elif config['initialization'] == "glorot":
+                stdv = math.sqrt(6. / (module.weight.size(0) + module.weight.size(1)))
+                module.weight.data.uniform_(-stdv, stdv)
+
+            else:
+                cprint("Default Weight Initialization", "red")
+
 
     # Loading the MNIST dataset
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
+
+    if config['data_reduction'] != 1.:
+        x_train, y_train = utils.reduce_trainset_size(x_train, y_train)
 
     # If GPU is available, sends model and dataset on the GPU
     if torch.cuda.is_available():
@@ -62,7 +80,6 @@ def train_model(config, config_number, gpu_id):
     optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=config['momentum'])
     loss_fn = nn.CrossEntropyLoss()
 
-
     # Initial accuracy
     output = model(x_valid)
     loss = loss_fn(output, y_valid)
@@ -70,7 +87,6 @@ def train_model(config, config_number, gpu_id):
     prediction = torch.max(output.data, 1)[1]
     accuracy = (prediction.eq(y_valid.data).sum() / y_valid.size(0)) * 100
     print("BEFORE TRAINING \n\tLoss : {0:.3f} \n\tAcc : {1:.3f}".format(loss.data[0], accuracy))
-
 
     # TRAINING LOOP
     for epoch in range(1, config["max_epochs"]):
@@ -98,8 +114,6 @@ def train_model(config, config_number, gpu_id):
             # Takes one training step
             optimizer.step()
 
-
-
         output = model(x_valid)
         loss = loss_fn(output, y_valid)
 
@@ -115,13 +129,6 @@ def train_model(config, config_number, gpu_id):
     # TODO
 
     return
-
-
-
-
-
-
-
 
 if __name__ == "__main__":
     # Retrieves arguments from the command line
