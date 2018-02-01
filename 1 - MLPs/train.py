@@ -11,7 +11,6 @@ from configs import myConfigs
 import os
 import argparse
 import math
-from termcolor import cprint
 
 import numpy as np
 
@@ -21,11 +20,11 @@ torch.manual_seed(1234)
 def train_model(config, config_number, gpu_id):
     # Instantiating the model
     model = MLP(784, config["hidden_layers"], 10, act_fn=config["activation"])
+    print(model)
 
     # Initializes the parameters
     for module in model.modules():
         if isinstance(module, nn.Linear):
-            print(module)
             module.bias.data.fill_(0.)
 
             if config['initialization'] == "zero":
@@ -39,7 +38,7 @@ def train_model(config, config_number, gpu_id):
                 module.weight.data.uniform_(-stdv, stdv)
 
             else:
-                cprint("Default Weight Initialization", "red")
+                print("WATCH-OUT : Default Weight Initialization", "red")
 
 
     # Loading the MNIST dataset
@@ -80,13 +79,44 @@ def train_model(config, config_number, gpu_id):
     optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=config['momentum'])
     loss_fn = nn.CrossEntropyLoss()
 
-    # Initial accuracy
-    output = model(x_valid)
-    loss = loss_fn(output, y_valid)
+    # Records the model's performance
+    train_tape = [[],[]]
+    valid_tape = [[],[]]
+    test_tape = [[],[]]
 
-    prediction = torch.max(output.data, 1)[1]
-    accuracy = (prediction.eq(y_valid.data).sum() / y_valid.size(0)) * 100
-    print("BEFORE TRAINING \n\tLoss : {0:.3f} \n\tAcc : {1:.3f}".format(loss.data[0], accuracy))
+    def evaluate(data, labels):
+
+        if not isinstance(data, Variable):
+            if torch.cuda.is_available():
+                data = Variable(data).cuda(gpu_id)
+                labels = Variable(labels).cuda(gpu_id)
+            else:
+                data = Variable(data)
+                labels = Variable(labels)
+
+        output = model(data)
+        loss = loss_fn(output, labels)
+        prediction = torch.max(output.data, 1)[1]
+        accuracy = (prediction.eq(labels.data).sum() / labels.size(0)) * 100
+
+        return loss.data[0], accuracy
+
+    # Record train accuracy
+    train_loss, train_acc = evaluate(x_train, y_train)
+    train_tape[0].append(train_loss)
+    train_tape[1].append(train_acc)
+
+    # Record valid accuracy
+    valid_loss, valid_acc = evaluate(x_valid, y_valid)
+    valid_tape[0].append(valid_loss)
+    valid_tape[1].append(valid_acc)
+
+    # Record test accuracy
+    test_loss, test_acc = evaluate(x_test, y_test)
+    test_tape[0].append(test_loss)
+    test_tape[1].append(test_acc)
+
+    print("BEFORE TRAINING \nLoss : {0:.3f} \nAcc : {1:.3f}".format(valid_loss, valid_acc))
 
     # TRAINING LOOP
     for epoch in range(1, config["max_epochs"]):
@@ -114,27 +144,40 @@ def train_model(config, config_number, gpu_id):
             # Takes one training step
             optimizer.step()
 
-        output = model(x_valid)
-        loss = loss_fn(output, y_valid)
+        # Record train accuracy
+        train_loss, train_acc = evaluate(x_train, y_train)
+        train_tape[0].append(train_loss)
+        train_tape[1].append(train_acc)
 
-        prediction = torch.max(output.data, 1)[1]
-        accuracy = (prediction.eq(y_valid.data).sum() / y_valid.size(0)) * 100
+        # Record valid accuracy
+        valid_loss, valid_acc = evaluate(x_valid, y_valid)
+        valid_tape[0].append(valid_loss)
+        valid_tape[1].append(valid_acc)
 
-        print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, loss.data[0], accuracy))
+        # Record test accuracy
+        test_loss, test_acc = evaluate(x_test, y_test)
+        test_tape[0].append(test_loss)
+        test_tape[1].append(test_acc)
+
+        print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
+
 
     if not os.path.exists("results"):
         os.makedirs("results")
 
     # Saves the graphs
-    # TODO
+    exp_name = "config" + str(config_number)
+    utils.save_results(train_tape, valid_tape, test_tape, exp_name)
 
     return
+
+
 
 if __name__ == "__main__":
     # Retrieves arguments from the command line
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--config', type=str, required=True,
+    parser.add_argument('--config', type=str, default='0',
                         help='config id number')
 
     parser.add_argument('--gpu', type=str, default='0',
