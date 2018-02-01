@@ -18,14 +18,21 @@ torch.manual_seed(1234)
 def train_model(config, config_number, gpu_id):
 
     # Instantiating the model
-    model = MLP(784, config["hidden_layers"], 10)
+    model = MLP(784, config["hidden_layers"], 10, act_fn=config["activation"])
+
+    # Initializes the parameters    
+    for module in model.modules():
+        if isinstance(module, nn.Linear):
+            print(module)
+            #torch.nn.init.xavier_uniform(module.weight.data, gain=nn.init.calculate_gain(config['activation']))
+            #module.bias.data.fill_(0.)
 
     # Loading the MNIST dataset
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
 
     # If GPU is available, sends model and dataset on the GPU
-    if False and torch.cuda.is_available():
-        model.cuda()
+    if torch.cuda.is_available():
+        model.cuda(gpu_id)
 
         x_train = torch.from_numpy(x_train).cuda(gpu_id)
         y_train = torch.from_numpy(y_train).cuda(gpu_id)
@@ -59,16 +66,19 @@ def train_model(config, config_number, gpu_id):
     # Initial accuracy
     output = model(x_valid)
     loss = loss_fn(output, y_valid)
-    print("Before training : {0:.3f}".format(loss.data[0]))
+
+    prediction = torch.max(output.data, 1)[1]
+    accuracy = (prediction.eq(y_valid.data).sum() / y_valid.size(0)) * 100
+    print("BEFORE TRAINING \n\tLoss : {0:.3f} \n\tAcc : {1:.3f}".format(loss.data[0], accuracy))
 
 
     # TRAINING LOOP
     for epoch in range(1, config["max_epochs"]):
         for x_batch, y_batch in loader:
 
-            if False and torch.cuda.is_available():
-                x_batch = Variable(x_batch).cuda()
-                y_batch = Variable(y_batch).cuda()
+            if torch.cuda.is_available():
+                x_batch = Variable(x_batch).cuda(gpu_id)
+                y_batch = Variable(y_batch).cuda(gpu_id)
             else:
                 x_batch = Variable(x_batch)
                 y_batch = Variable(y_batch)
@@ -96,7 +106,7 @@ def train_model(config, config_number, gpu_id):
         prediction = torch.max(output.data, 1)[1]
         accuracy = (prediction.eq(y_valid.data).sum() / y_valid.size(0)) * 100
 
-        print("Epoch {0} \n Loss : {1:.3f} \n Acc : {2:.3f}".format(epoch, loss.data[0], accuracy))
+        print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, loss.data[0], accuracy))
 
     if not os.path.exists("results"):
         os.makedirs("results")
