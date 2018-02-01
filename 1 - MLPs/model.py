@@ -7,9 +7,6 @@ class MLP(nn.Module):
 
         super(MLP, self).__init__()
 
-        # Input layer
-        self.inp = nn.Linear(inp_size, h_sizes[0])
-
         # Hidden layers
         self.hidden = []
         for k in range(len(h_sizes)-1):
@@ -21,12 +18,11 @@ class MLP(nn.Module):
     def forward(self, x):
 
         # Feedforward
-        x = F.relu(self.inp(x))
         for layer in self.hidden:
             x = F.relu(layer(x))
-        pred = F.softmax(self.out(x), dim=1) # TODO: make sure this dim is right
+        output = F.softmax(self.out(x), dim=1)
 
-        return pred
+        return output
 
     def name(self):
         return "MLP"

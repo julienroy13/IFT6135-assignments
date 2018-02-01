@@ -24,7 +24,7 @@ def train_model(config, config_number, gpu_id):
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
 
     # If GPU is available, sends model and dataset on the GPU
-    if torch.cuda.is_available():
+    if False and torch.cuda.is_available():
         model.cuda()
 
         x_train = torch.from_numpy(x_train).cuda(gpu_id)
@@ -57,8 +57,8 @@ def train_model(config, config_number, gpu_id):
 
 
     # Initial accuracy
-    pred = model(x_valid)
-    loss = loss_fn(pred, y_valid)
+    output = model(x_valid)
+    loss = loss_fn(output, y_valid)
     print("Before training : {0:.3f}".format(loss.data[0]))
 
 
@@ -66,7 +66,7 @@ def train_model(config, config_number, gpu_id):
     for epoch in range(1, config["max_epochs"]):
         for x_batch, y_batch in loader:
 
-            if torch.cuda.is_available():
+            if False and torch.cuda.is_available():
                 x_batch = Variable(x_batch).cuda()
                 y_batch = Variable(y_batch).cuda()
             else:
@@ -77,10 +77,10 @@ def train_model(config, config_number, gpu_id):
             optimizer.zero_grad()
 
             # Feedforward through the model
-            pred = model(x_batch)
+            output = model(x_batch)
 
             # Computes the loss
-            loss = loss_fn(pred, y_batch)
+            loss = loss_fn(output, y_batch)
 
             # Backpropagates to compute the gradients
             loss.backward()
@@ -90,9 +90,13 @@ def train_model(config, config_number, gpu_id):
 
 
 
-        pred = model(x_valid)
-        loss = loss_fn(pred, y_valid)
-        print("Epoch {0} : {1:.3f}".format(epoch, loss.data[0]))
+        output = model(x_valid)
+        loss = loss_fn(output, y_valid)
+
+        prediction = torch.max(output.data, 1)[1]
+        accuracy = (prediction.eq(y_valid.data).sum() / y_valid.size(0)) * 100
+
+        print("Epoch {0} \n Loss : {1:.3f} \n Acc : {2:.3f}".format(epoch, loss.data[0], accuracy))
 
     if not os.path.exists("results"):
         os.makedirs("results")
