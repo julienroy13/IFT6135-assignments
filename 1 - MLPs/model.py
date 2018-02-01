@@ -18,13 +18,13 @@ class MLP(nn.Module):
         # Output layer
         self.out = nn.Linear(h_sizes[-1], out_size)
 
-    def forward(self, x, y):
+    def forward(self, x):
 
         # Feedforward
         x = F.relu(self.inp(x))
         for layer in self.hidden:
             x = F.relu(layer(x))
-        pred = F.softmax(self.out(x))
+        pred = F.softmax(self.out(x), dim=1) # TODO: make sure this dim is right
 
         return pred
 
