@@ -36,13 +36,71 @@ myConfigs = (CarefulDict([
         "initialization": "default", # "glorot", "zero", "normal"
         
         "mb_size": 1000,
-        "max_epochs": 100,
+        "max_epochs": 3,
 
         "lr": 0.01,
         "momentum": 0.9,
 
+        "show_test": False,
         "save_plots": True
         }
+    ),
+
+    (1, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [512, 128],
+        "activation": "relu",  # "relu", "sigmoid"
+        "initialization": "normal",  # "glorot", "zero", "normal"
+
+        "mb_size": 1000,
+        "max_epochs": 3,
+
+        "lr": 0.01,
+        "momentum": 0.9,
+
+        "show_test": False,
+        "save_plots": True
+        }
+    ),
+
+    (2, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [512, 128],
+        "activation": "relu",  # "relu", "sigmoid"
+        "initialization": "glorot",  # "glorot", "zero", "normal"
+
+        "mb_size": 1000,
+        "max_epochs": 3,
+
+        "lr": 0.01,
+        "momentum": 0.9,
+
+        "show_test": False,
+        "save_plots": True
+        }
+    ),
+
+    (3, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [512, 128],
+        "activation": "relu",  # "relu", "sigmoid"
+        "initialization": "zero",  # "glorot", "zero", "normal"
+
+        "mb_size": 1000,
+        "max_epochs": 3,
+
+        "lr": 0.01,
+        "momentum": 0.9,
+
+        "show_test": True,
+        "save_plots": True
+    }
      ),
 
 ]))

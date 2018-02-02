@@ -167,7 +167,8 @@ def train_model(config, config_number, gpu_id):
 
     # Saves the graphs
     exp_name = "config" + str(config_number)
-    utils.save_results(train_tape, valid_tape, test_tape, exp_name, config['data_file'])
+    utils.save_results(train_tape, valid_tape, test_tape, exp_name, config['data_file'], config['show_test'])
+    utils.update_comparative_chart(config['show_test'])
 
     return
 

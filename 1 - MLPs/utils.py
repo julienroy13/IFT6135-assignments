@@ -40,7 +40,7 @@ def save_model(model):
     pass # TODO
     return
 
-def save_results(train_tape, valid_tape, test_tape, exp_name, data_file):
+def save_results(train_tape, valid_tape, test_tape, exp_name, data_file, show_test):
 
     # Creates the folder if necessary
     saving_dir = os.path.join("results", exp_name)
@@ -57,7 +57,8 @@ def save_results(train_tape, valid_tape, test_tape, exp_name, data_file):
     plt.title("Loss", fontweight='bold')
     plt.plot(epochs, train_tape[0], color="blue", label="Training set")
     plt.plot(epochs, valid_tape[0], color="orange", label="Validation set")
-    plt.plot(epochs, test_tape[0], color="purple", label="Test set")
+    if show_test:
+        plt.plot(epochs, test_tape[0], color="purple", label="Test set")
     plt.xlabel("Epochs")
     plt.legend(loc='best')
 
@@ -65,7 +66,8 @@ def save_results(train_tape, valid_tape, test_tape, exp_name, data_file):
     plt.title("Accuracy", fontweight='bold')
     plt.plot(epochs, train_tape[1], color="blue", label="Training set")
     plt.plot(epochs, valid_tape[1], color="orange", label="Validation set")
-    plt.plot(epochs, test_tape[1], color="purple", label="Test set")
+    if show_test:
+        plt.plot(epochs, test_tape[1], color="purple", label="Test set")
     plt.ylim(0, 100)
     plt.xlabel("Epochs")
     plt.legend(loc='best')
@@ -76,17 +78,19 @@ def save_results(train_tape, valid_tape, test_tape, exp_name, data_file):
     # Save the recording tapes (learning curves) in a file
     log_file = os.path.join(saving_dir, 'log_' + exp_name + '.pkl')
     with open(log_file, 'wb') as f:
-        pkl.dump({
+        pickle.dump({
             'data_file': data_file,
             'train_tape': train_tape,
             'valid_tape': valid_tape,
             'test_tape': test_tape
-            })
+            }, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print('Results saved')
 
     return
 
 
-def init_comparative_chart():
+def update_comparative_chart(show_test):
     
     all_configs_results = []
 
@@ -96,23 +100,23 @@ def init_comparative_chart():
         
         if folder.startswith('config'):
             config_number = int(folder.lstrip('config'))
-            log_file      = os.path.join('results', folder, 'log_config'+config_number+'.pkl')
+            log_file      = os.path.join('results', folder, 'log_config'+str(config_number)+'.pkl')
 
             # If the log_file exists, extracts the recording tapes it contains
             if os.path.exists(log_file):
                 
                 with open(log_file, 'rb') as f:
-                    log_data = pkl.load(f)
+                    log_data = pickle.load(f)
                 
                 data_file = log_data['data_file']
                 
                 train_tape = log_data['train_tape']
-                valid_tape = out_data['valid_tape']
-                test_tape  = out_data['test_tape']
+                valid_tape = log_data['valid_tape']
+                test_tape  = log_data['test_tape']
                 
                 # If tape is not empty, collects the results
                 if len(valid_tape[1]) > 0:
-                    best_epoch = np.argmax(valid_scores)
+                    best_epoch = np.argmax(valid_tape[1])
                     
                     best_train = train_tape[1][best_epoch]
                     best_valid = valid_tape[1][best_epoch]
@@ -136,38 +140,47 @@ def init_comparative_chart():
         test_scores.append(results[1][2])
 
     # Plot
-    locations = np.arange(len(all_configs_results))  # the x locations for the groups
-    width = 0.35  # the width of the bars
+    if show_test:
+        n_bars = 3
+        bar_width = .75
+    else:
+        n_bars = 2
+        bar_width = 1.15
 
-    plt.figure(figsize=(len(config_numbers), 10))
+    locations = 3 * np.arange(len(all_configs_results))  # the x locations for the groups
+
+    plt.figure(figsize=(np.max(locations), 10))
     ax = plt.subplot(1,1,1)
 
-    bars1 = ax.bar(locations, train_scores, width, color='blue', label='Train')
-    bars2 = ax.bar(locations + width, valid_scores, width, color='orange', label='Valid')
-    bars3 = ax.bar(locations + 2*width, test_scores, width, color='purple', label='Test')
+    bars1 = ax.bar(locations, train_scores, bar_width, color='blue', label='Train')
+    bars2 = ax.bar(locations + bar_width, valid_scores, bar_width, color='orange', label='Valid')
+    if show_test:
+        bars3 = ax.bar(locations + 2*bar_width, test_scores, bar_width, color='purple', label='Test')
 
     # add some text for labels, title and axes ticks
-    ax.set_ylabel('Scores')
-    ax.set_title('Comparative score chart for configs')
-    ax.set_xticks(locations + width/3)
+    ax.set_ylabel('Accuracy')
+    ax.set_title('Comparative score chart for configs', fontweight='bold')
+    ax.set_xticks(locations + ((n_bars-1)*bar_width/2.)) # (n_bars-1)*
     ax.set_xticklabels(config_numbers)
     #ax.legend((rects1[0], rects2[0]), ('Valid', 'Test'))
     ax.legend(loc='best')
 
 
-def saveComparativeBarChart(data_file, config_number, best_valid_acc, train_acc, test_acc):
-    
-
-    def autolabel(rects):
+    def autolabel(bars):
         # Attach a text label above each bar displaying its height
-        for rect in rects:
-            height = rect.get_height()
-            ax.text(rect.get_x() + rect.get_width() / 2., 0.85 * height,
-                    '%d' % int(height),
-                    ha='center', va='bottom')
+        for bar in bars:
+            height = bar.get_height()
+            print(height)
+            ax.text(bar.get_x() + bar.get_width()/2, 0.85 * height, '%.2f' % height, ha='center', va='bottom')
 
-    autolabel(rects1)
-    autolabel(rects2)
+    autolabel(bars1)
+    autolabel(bars2)
+    if show_test:
+        autolabel(bars3)
 
-    plt.savefig(''.join(data_path.split('.')[:-1]) + '.png')
+    plt.savefig(os.path.join('results', 'results.png'))
     plt.close()
+
+    print("Comparative chart has been updated")
+
+    return
