@@ -38,7 +38,7 @@ def train_model(config, config_number, gpu_id):
                 module.weight.data.uniform_(-stdv, stdv)
 
             else:
-                print("WATCH-OUT : Default Weight Initialization", "red")
+                print("WATCH-OUT : Default Weight Initialization")
 
 
     # Loading the MNIST dataset
@@ -167,7 +167,7 @@ def train_model(config, config_number, gpu_id):
 
     # Saves the graphs
     exp_name = "config" + str(config_number)
-    utils.save_results(train_tape, valid_tape, test_tape, exp_name)
+    utils.save_results(train_tape, valid_tape, test_tape, exp_name, config['data_file'])
 
     return
 

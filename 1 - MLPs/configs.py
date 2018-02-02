@@ -36,7 +36,7 @@ myConfigs = (CarefulDict([
         "initialization": "default", # "glorot", "zero", "normal"
         
         "mb_size": 1000,
-        "max_epochs": 3,
+        "max_epochs": 100,
 
         "lr": 0.01,
         "momentum": 0.9,
