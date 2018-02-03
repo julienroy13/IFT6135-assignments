@@ -179,8 +179,8 @@ def train_model(config, gpu_id, save_dir, exp_name):
         os.makedirs(save_dir)
 
     # Saves the graphs
-    utils.save_results(train_tape, valid_tape, test_tape, exp_name, config['data_file'], config['show_test'])
-    utils.update_comparative_chart(config['show_test'])
+    utils.save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, config['data_file'], config['show_test'])
+    utils.update_comparative_chart(save_dir, config['show_test'])
 
     return
 

@@ -29,9 +29,9 @@ rsConfigs = (CarefulDict([
     
     (0, {
         "hp_to_search": ["activation", "initialization", "mb_size", "lr"],
-        "n_samples": 5,
+        "n_samples": 50,
 
-        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_file": os.path.join("..", "data", "mnist_data.pkl"),
         "data_reduction": 1.0, # 0.01, 0.02, 0.05, 0.1, 1.0
         
         "hidden_layers": [1024, 512],
@@ -39,7 +39,7 @@ rsConfigs = (CarefulDict([
         "initialization": ("ind", ["default", "glorot", "zero", "normal"]),
         
         "mb_size": ("int", [10, 1000]),
-        "max_epochs": 2,
+        "max_epochs": 100,
 
         "lr": ("exp", [-5, 0]),
         "momentum": 0.9,

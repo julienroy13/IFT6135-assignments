@@ -40,10 +40,10 @@ def save_model(model):
     pass # TODO
     return
 
-def save_results(train_tape, valid_tape, test_tape, exp_name, data_file, show_test):
+def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_file, show_test):
 
     # Creates the folder if necessary
-    saving_dir = os.path.join("results", exp_name)
+    saving_dir = os.path.join(save_dir, exp_name)
     if not os.path.exists(saving_dir):
         os.makedirs(saving_dir)
 
@@ -100,17 +100,28 @@ def save_results(train_tape, valid_tape, test_tape, exp_name, data_file, show_te
     return
 
 
-def update_comparative_chart(show_test):
+def update_comparative_chart(result_dir, show_test):
     
     all_configs_results = []
 
     # Finds the right folders
-    result_folders = os.listdir("results")
-    for folder in result_folders:
+    result_folders = os.listdir(result_dir)
+
+    for thing in result_folders:
         
-        if folder.startswith('config') and not folder.endswith('.out'):
-            config_number = int(folder.lstrip('config'))
-            log_file      = os.path.join('results', folder, 'log_config'+str(config_number)+'.pkl')
+        if len(thing.split('.')) == 1 and (thing.startswith('config') or thing.startswith('sample')): # if thing is a folder
+
+            folder = thing
+            if folder.startswith('config'):
+                things_name = 'configs'
+                config_number = int(folder.lstrip('config'))
+            elif folder.startswith('sample'):
+                things_name = 'samples'
+                config_number = int(folder.lstrip('sample'))
+            files = os.listdir(os.path.join(result_dir, folder))
+            for f in files:
+                if f.startswith('log_'):
+                    log_file = os.path.join(result_dir, folder, f)
 
             # If the log_file exists, extracts the recording tapes it contains
             if os.path.exists(log_file):
@@ -169,7 +180,7 @@ def update_comparative_chart(show_test):
 
     # add some text for labels, title and axes ticks
     ax.set_ylabel('Accuracy')
-    ax.set_title('Comparative score chart for configs', fontweight='bold')
+    ax.set_title('Comparative score chart for {}'.format(things_name), fontweight='bold')
     ax.set_xticks(locations + ((n_bars-1)*bar_width/2.)) # (n_bars-1)*
     ax.set_xticklabels(config_numbers)
     ax.legend(loc='best')
@@ -186,7 +197,7 @@ def update_comparative_chart(show_test):
     if show_test:
         autolabel(bars3)
 
-    plt.savefig(os.path.join('results', 'results.png'))
+    plt.savefig(os.path.join(result_dir, 'results.png'))
     plt.close()
 
     print("Comparative chart has been updated")
