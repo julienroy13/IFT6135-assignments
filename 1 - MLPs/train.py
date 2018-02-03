@@ -35,15 +35,6 @@ def train_model(config, gpu_id, save_dir, exp_name):
             elif config['initialization'] == "glorot":
                 stdv = math.sqrt(6. / (module.weight.size(0) + module.weight.size(1)))
                 module.weight.data.uniform_(-stdv, stdv)
-                """
-                fan_in, fan_out = nn.init._calculate_fan_in_and_fan_out(module.weight.data)
-                std = math.sqrt(2.0) * math.sqrt(2.0 / (fan_in + fan_out))
-                a = math.sqrt(3.0) * std  # Calculate uniform bounds from standard deviation
-                module.weight.data.uniform_(-a, a)
-                """
-                """
-                nn.init.xavier_uniform(module.weight.data, gain=math.sqrt(2.0))
-                """
 
             elif config['initialization'] == "default":
                 stdv = 1. / math.sqrt(module.weight.size(1))
