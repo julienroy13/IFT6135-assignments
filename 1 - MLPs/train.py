@@ -17,7 +17,7 @@ import numpy as np
 torch.manual_seed(1234)
 
 
-def train_model(config, config_number, gpu_id):
+def train_model(config, gpu_id, save_dir, exp_name):
     # Instantiating the model
     model = MLP(784, config["hidden_layers"], 10, act_fn=config["activation"])
 
@@ -175,11 +175,10 @@ def train_model(config, config_number, gpu_id):
         print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
 
 
-    if not os.path.exists("results"):
-        os.makedirs("results")
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
 
     # Saves the graphs
-    exp_name = "config" + str(config_number)
     utils.save_results(train_tape, valid_tape, test_tape, exp_name, config['data_file'], config['show_test'])
     utils.update_comparative_chart(config['show_test'])
 
@@ -204,7 +203,9 @@ if __name__ == "__main__":
     config_number = int(args.config)
     config = myConfigs[config_number]
     gpu_id = int(args.gpu)
+    save_dir = "results"
+    exp_name = "config" + str(config_number)
 
     # Runs the training procedure
     print("Running the training procedure for config-{}".format(config_number))
-    train_model(config, config_number, gpu_id)
+    train_model(config, gpu_id, save_dir, exp_name)
