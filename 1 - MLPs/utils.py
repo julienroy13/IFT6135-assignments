@@ -162,7 +162,6 @@ def update_comparative_chart(show_test):
     ax.set_title('Comparative score chart for configs', fontweight='bold')
     ax.set_xticks(locations + ((n_bars-1)*bar_width/2.)) # (n_bars-1)*
     ax.set_xticklabels(config_numbers)
-    #ax.legend((rects1[0], rects2[0]), ('Valid', 'Test'))
     ax.legend(loc='best')
 
 
