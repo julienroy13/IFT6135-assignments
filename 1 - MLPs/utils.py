@@ -108,7 +108,7 @@ def update_comparative_chart(show_test):
     result_folders = os.listdir("results")
     for folder in result_folders:
         
-        if folder.startswith('config'):
+        if folder.startswith('config') and not folder.endswith('.out'):
             config_number = int(folder.lstrip('config'))
             log_file      = os.path.join('results', folder, 'log_config'+str(config_number)+'.pkl')
 
