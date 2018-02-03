@@ -33,10 +33,10 @@ myConfigs = (CarefulDict([
         
         "hidden_layers": [512, 128],
         "activation": "relu", # "relu", "sigmoid"
-        "initialization": "default", # "glorot", "zero", "normal"
+        "initialization": "default", # "default", "glorot", "zero", "normal"
         
         "mb_size": 1000,
-        "max_epochs": 3,
+        "max_epochs": 100,
 
         "lr": 0.01,
         "momentum": 0.9,
@@ -52,10 +52,10 @@ myConfigs = (CarefulDict([
 
         "hidden_layers": [512, 128],
         "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "normal",  # "glorot", "zero", "normal"
+        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
 
         "mb_size": 1000,
-        "max_epochs": 3,
+        "max_epochs": 100,
 
         "lr": 0.01,
         "momentum": 0.9,
@@ -71,10 +71,10 @@ myConfigs = (CarefulDict([
 
         "hidden_layers": [512, 128],
         "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "glorot",  # "glorot", "zero", "normal"
+        "initialization": "normal",  # "default", "glorot", "zero", "normal"
 
         "mb_size": 1000,
-        "max_epochs": 3,
+        "max_epochs": 100,
 
         "lr": 0.01,
         "momentum": 0.9,
@@ -90,10 +90,10 @@ myConfigs = (CarefulDict([
 
         "hidden_layers": [512, 128],
         "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "zero",  # "glorot", "zero", "normal"
+        "initialization": "zero",  # "default", "glorot", "zero", "normal"
 
         "mb_size": 1000,
-        "max_epochs": 3,
+        "max_epochs": 100,
 
         "lr": 0.01,
         "momentum": 0.9,
