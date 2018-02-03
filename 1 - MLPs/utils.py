@@ -47,6 +47,16 @@ def save_results(train_tape, valid_tape, test_tape, exp_name, data_file, show_te
     if not os.path.exists(saving_dir):
         os.makedirs(saving_dir)
 
+    best_epoch = np.argmax(valid_tape[1])
+
+    best_train_acc = train_tape[1][best_epoch]
+    best_valid_acc = valid_tape[1][best_epoch]
+    best_test_acc = test_tape[1][best_epoch]
+
+    last_train_acc = train_tape[1][-1]
+    last_valid_acc = valid_tape[1][-1]
+    last_test_acc = test_tape[1][-1]
+
     # Creates and save the plots
     plt.figure(figsize=(20, 6))
 
@@ -64,10 +74,10 @@ def save_results(train_tape, valid_tape, test_tape, exp_name, data_file, show_te
 
     plt.subplot(1,2,2)
     plt.title("Accuracy", fontweight='bold')
-    plt.plot(epochs, train_tape[1], color="blue", label="Training set")
-    plt.plot(epochs, valid_tape[1], color="orange", label="Validation set")
+    plt.plot(epochs, train_tape[1], color="blue", label="Training set, best={0:.2f}, last={1:.2f}".format(best_train_acc, last_train_acc))
+    plt.plot(epochs, valid_tape[1], color="orange", label="Validation set, best={0:.2f}, last={1:.2f}".format(best_valid_acc, last_valid_acc))
     if show_test:
-        plt.plot(epochs, test_tape[1], color="purple", label="Test set")
+        plt.plot(epochs, test_tape[1], color="purple", label="Test set, best={0:.2f}, last={1:.2f}".format(best_test_acc, last_test_acc))
     plt.ylim(0, 100)
     plt.xlabel("Epochs")
     plt.legend(loc='best')
@@ -169,7 +179,6 @@ def update_comparative_chart(show_test):
         # Attach a text label above each bar displaying its height
         for bar in bars:
             height = bar.get_height()
-            print(height)
             ax.text(bar.get_x() + bar.get_width()/2, 0.85 * height, '%.2f' % height, ha='center', va='bottom')
 
     autolabel(bars1)
