@@ -11,6 +11,8 @@ from configs import myConfigs
 import os
 import argparse
 import math
+import time
+import pdb
 
 import numpy as np
 
@@ -19,37 +21,13 @@ torch.manual_seed(1234)
 
 def train_model(config, gpu_id, save_dir, exp_name):
     # Instantiating the model
-    model = MLP(784, config["hidden_layers"], 10, act_fn=config["activation"])
-
-    # Initializes the parameters
-    for module in model.modules():
-        if isinstance(module, nn.Linear):
-            module.bias.data.fill_(0.)
-
-            if config['initialization'] == "zero":
-                module.weight.data.fill_(0.)
-
-            elif config['initialization'] == "normal":
-                module.weight.data.normal_(0., 1.)
-
-            elif config['initialization'] == "glorot":
-                stdv = math.sqrt(6. / (module.weight.size(0) + module.weight.size(1)))
-                module.weight.data.uniform_(-stdv, stdv)
-
-            elif config['initialization'] == "default":
-                stdv = 1. / math.sqrt(module.weight.size(1))
-                module.weight.data.uniform_(-stdv, stdv)
-
-
-            else:
-                print("WATCH-OUT : Default Weight Initialization")
-
+    model = MLP(784, config["hidden_layers"], 10, config["activation"], config["initialization"], verbose=True)
 
     # Loading the MNIST dataset
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
 
     if config['data_reduction'] != 1.:
-        x_train, y_train = utils.reduce_trainset_size(x_train, y_train)
+        x_train, y_train = utils.reduce_trainset_size(x_train, y_train, config['data_reduction'])
 
     # If GPU is available, sends model and dataset on the GPU
     if torch.cuda.is_available():
@@ -81,7 +59,8 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     # Optimizer and Loss Function
     optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=config['momentum'])
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.NLLLoss()
+    #loss_fn = nn.CrossEntropyLoss()
 
     # Records the model's performance
     train_tape = [[],[]]
@@ -124,7 +103,10 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     # TRAINING LOOP
     for epoch in range(1, config["max_epochs"]):
-        for x_batch, y_batch in loader:
+        start = time.time()
+        for i,(x_batch, y_batch) in enumerate(loader):
+
+            #pdb.set_trace()
 
             if torch.cuda.is_available():
                 x_batch = Variable(x_batch).cuda(gpu_id)
@@ -141,6 +123,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
             # Computes the loss
             loss = loss_fn(output, y_batch)
+            #print(i, loss)
 
             # Backpropagates to compute the gradients
             loss.backward()
@@ -164,6 +147,8 @@ def train_model(config, gpu_id, save_dir, exp_name):
         test_tape[1].append(test_acc)
 
         print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
+        print("Time : {0:.2f}".format(time.time() - start))
+
 
 
     if not os.path.exists(save_dir):
