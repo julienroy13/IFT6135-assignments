@@ -82,7 +82,7 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_fil
     plt.xlabel("Epochs")
     plt.legend(loc='best')
 
-    plt.axvline(x=best_epoch)
+    plt.axvline(x=best_epoch, color='grey', linestyle='--')
 
     plt.savefig(os.path.join(saving_dir, exp_name + '.png'), bbox_inches='tight')
     plt.close()
