@@ -45,8 +45,7 @@ class MLP(nn.Module):
             a = layer(x)
             x = self.act_fn(a)
 
-        output = self.out(x)
-        #output = F.log_softmax(self.out(x), dim=1)
+        output = F.log_softmax(self.out(x), dim=1)
 
         return output
 

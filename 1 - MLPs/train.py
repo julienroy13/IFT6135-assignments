@@ -59,8 +59,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     # Optimizer and Loss Function
     optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=config['momentum'])
-    #loss_fn = nn.NLLLoss()
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.NLLLoss()
 
     # Records the model's performance
     train_tape = [[],[]]
