@@ -32,8 +32,8 @@ myConfigs = (CarefulDict([
         "data_reduction": 1.0, # 0.01, 0.02, 0.05, 0.1, 1.0
         
         "hidden_layers": [512, 512],
-        "activation": "relu", # "relu", "sigmoid"
-        "initialization": "default", # "default", "glorot", "zero", "normal"
+        "activation": "relu", # "relu", "sigmoid", "tanh"
+        "initialization": "bsjhakb", # "default", "glorot", "zero", "normal"
         
         "mb_size": 100,
         "max_epochs": 100,

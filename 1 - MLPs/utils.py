@@ -20,6 +20,12 @@ def load_mnist(data_file):
     x_test = mnist['x_test']
     y_test = mnist['y_test']
 
+    # Rescale data from [0, 255] to [0, 1]
+    if np.max(x_train) > 1.0:
+        x_train = x_train / 255.
+        x_valid = x_valid / 255.
+        x_test = x_test / 255.
+
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
 

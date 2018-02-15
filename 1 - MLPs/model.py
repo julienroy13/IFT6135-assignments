@@ -20,6 +20,12 @@ class MLP(nn.Module):
         elif act_fn == "sigmoid":
             self.act_fn = F.sigmoid
 
+        elif act_fn == "tanh":
+            self.act_fn = F.tanh
+
+        else:
+            raise ValueError('Specified activation function "{}" is not recognized.'.format(act_fn))
+
         # Output layer
         self.out = nn.Linear(h_sizes[-1], out_size)
 
@@ -29,7 +35,7 @@ class MLP(nn.Module):
         if verbose:
             print('\nModel Info ------------')
             print(self)
-            print("Total number of parameters : ")
+            print("Total number of parameters : {:.2f} M".format(self.get_number_of_params() / 1e6))
             print('---------------------- \n')
 
     def forward(self, x):
@@ -39,8 +45,8 @@ class MLP(nn.Module):
             a = layer(x)
             x = self.act_fn(a)
 
-        #output = self.out(x)
-        output = F.log_softmax(self.out(x), dim=1)
+        output = self.out(x)
+        #output = F.log_softmax(self.out(x), dim=1)
 
         return output
 
@@ -66,6 +72,21 @@ class MLP(nn.Module):
 
         for p in self.parameters():
             p.requires_grad = True
+
+    def get_number_of_params(self):
+
+        total_params = 0
+
+        for params in self.parameters():
+
+            total_size = 1
+            for size in params.size():
+
+                total_size *= size
+
+            total_params += total_size
+
+        return total_params
 
     def name(self):
         return "MLP"

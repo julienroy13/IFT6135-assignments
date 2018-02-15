@@ -59,8 +59,8 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     # Optimizer and Loss Function
     optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=config['momentum'])
-    loss_fn = nn.NLLLoss()
-    #loss_fn = nn.CrossEntropyLoss()
+    #loss_fn = nn.NLLLoss()
+    loss_fn = nn.CrossEntropyLoss()
 
     # Records the model's performance
     train_tape = [[],[]]
@@ -123,7 +123,13 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
             # Computes the loss
             loss = loss_fn(output, y_batch)
+
             #print(i, loss)
+
+            #if i % 10 == 0:
+             #   print("LOSS : {}".format(loss))
+              #  print("MAX : {}".format(torch.max(output)[0]))
+               # time.sleep(2)
 
             # Backpropagates to compute the gradients
             loss.backward()
