@@ -103,6 +103,9 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_fil
             'test_tape': test_tape
             }, f, protocol=pickle.HIGHEST_PROTOCOL)
 
+    #Prints out the test accuracy at epoch=best_valid_accuracy
+    print("Accuracy on Test-Set : {}".format(best_test_acc))
+
     print('Results saved')
 
     return

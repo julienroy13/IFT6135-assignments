@@ -33,7 +33,7 @@ myConfigs = (CarefulDict([
         
         "hidden_layers": [512, 512],
         "activation": "relu", # "relu", "sigmoid", "tanh"
-        "initialization": "bsjhakb", # "default", "glorot", "zero", "normal"
+        "initialization": "glorot", # "default", "glorot", "zero", "normal"
         
         "mb_size": 100,
         "max_epochs": 100,
@@ -52,7 +52,7 @@ myConfigs = (CarefulDict([
 
         "hidden_layers": [512, 512],
         "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
+        "initialization": "default",  # "default", "glorot", "zero", "normal"
 
         "mb_size": 100,
         "max_epochs": 100,
@@ -97,6 +97,66 @@ myConfigs = (CarefulDict([
 
         "lr": 0.01,
         "momentum": 0.0,
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+    # OPTIMAL
+    (4, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [512, 512],
+        "activation": "sigmoid",  # "relu", "sigmoid"
+        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
+
+        "mb_size": 40,
+        "max_epochs": 100,
+
+        "lr": 1.0,
+        "momentum": 0.5,
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+    # OPTIMAL - doubled capacity
+    (5, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [1024, 1024],
+        "activation": "sigmoid",  # "relu", "sigmoid"
+        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
+
+        "mb_size": 40,
+        "max_epochs": 100,
+
+        "lr": 1.0,
+        "momentum": 0.5,
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+    # OPTIMAL - sanity test
+    (6, {
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [512, 512],
+        "activation": "sigmoid",  # "relu", "sigmoid"
+        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
+
+        "mb_size": 40,
+        "max_epochs": 100,
+
+        "lr": 1.0,
+        "momentum": 0.5,
 
         "show_test": False,
         "save_plots": True

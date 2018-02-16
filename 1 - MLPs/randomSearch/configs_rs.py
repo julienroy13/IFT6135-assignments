@@ -38,10 +38,10 @@ rsConfigs = (CarefulDict([
         "activation": ("ind", ["relu", "sigmoid", "tanh"]),
         "initialization": "glorot",
         
-        "mb_size": ("int", [10, 1000]),
+        "mb_size": ("int", [10, 500]),
         "max_epochs": 100,
 
-        "lr": ("exp", [-4, 0]),
+        "lr": ("exp", [-3, 0]),
         "momentum": ("ind", [0.0, 0.1, 0.5, 0.9]),
 
         "show_test": False,
