@@ -28,21 +28,21 @@ class CarefulDict(dict):
 rsConfigs = (CarefulDict([
     
     (0, {
-        "hp_to_search": ["activation", "initialization", "mb_size", "lr"],
-        "n_samples": 50,
+        "hp_to_search": ["activation", "mb_size", "lr", "momentum"],
+        "n_samples": 100,
 
         "data_file": os.path.join("..", "data", "mnist_data.pkl"),
         "data_reduction": 1.0, # 0.01, 0.02, 0.05, 0.1, 1.0
         
-        "hidden_layers": [1024, 512],
-        "activation": ("ind", ["relu", "sigmoid"]),
-        "initialization": ("ind", ["default", "glorot", "zero", "normal"]),
+        "hidden_layers": [512, 512],
+        "activation": ("ind", ["relu", "sigmoid", "tanh"]),
+        "initialization": "glorot",
         
         "mb_size": ("int", [10, 1000]),
         "max_epochs": 100,
 
-        "lr": ("exp", [-5, 0]),
-        "momentum": 0.9,
+        "lr": ("exp", [-4, 0]),
+        "momentum": ("ind", [0.0, 0.1, 0.5, 0.9]),
 
         "show_test": False,
         "save_plots": True
