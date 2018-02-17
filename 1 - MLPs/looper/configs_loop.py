@@ -29,7 +29,7 @@ loopConfigs = (CarefulDict([
     
     (0, {
         "hyperparam_studied": "data_reduction",
-        "n_samples": 2,
+        "n_samples": 5,
 
         "data_file": os.path.join("..", "data", "mnist_data.pkl"),
         "data_reduction": [0.01, 0.02, 0.05, 0.1, 1.0], # 0.01, 0.02, 0.05, 0.1, 1.0
@@ -39,7 +39,7 @@ loopConfigs = (CarefulDict([
         "initialization": "glorot",
         
         "mb_size": 40,
-        "max_epochs": 2,
+        "max_epochs": 100,
 
         "lr": 1.0,
         "momentum": 0.5,

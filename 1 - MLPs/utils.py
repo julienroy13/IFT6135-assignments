@@ -116,9 +116,9 @@ def update_comparative_chart(save_dir, show_test):
     all_configs_results = []
 
     # Finds the right folders
-    result_folders = os.listdir(save_dir)
+    result_folders = sorted(os.listdir(save_dir))
 
-    for thing in result_folders:
+    for i, thing in enumerate(result_folders):
         
         if os.path.isdir(os.path.join(save_dir, thing)): # if thing is a folder
 
@@ -129,6 +129,9 @@ def update_comparative_chart(save_dir, show_test):
             elif folder.startswith('sample'):
                 things_name = 'samples'
                 config_number = int(folder.lstrip('sample'))
+            else:
+                things_name = 'runs'
+                config_number = i
             files = os.listdir(os.path.join(save_dir, folder))
             for f in files:
                 if f.startswith('log_'):

@@ -55,8 +55,8 @@ def create_result_text_file(save_dir, out_filename, hyperparam_studied):
         for line in stats.keys():
             f.write(line + '\t')
             f.write(str(np.round(stats[line], 3)) + "\t")
-            f.write('mean=' + str(means[line]) + '\t')
-            f.write('std=' + str(stds[line]) + '\t')
+            f.write('mean={0:.3f}\t'.format(means[line]))
+            f.write('std={0:.3f}\t'.format(stds[line]))
             f.write('\n')
     return
 
