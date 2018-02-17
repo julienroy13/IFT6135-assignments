@@ -46,7 +46,7 @@ def save_model(model):
     pass # TODO
     return
 
-def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_file, show_test):
+def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, config):
 
     # Creates the folder if necessary
     saving_dir = os.path.join(save_dir, exp_name)
@@ -73,7 +73,7 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_fil
     plt.title("Loss", fontweight='bold')
     plt.plot(epochs, train_tape[0], color="blue", label="Training set")
     plt.plot(epochs, valid_tape[0], color="orange", label="Validation set")
-    if show_test:
+    if config['show_test']:
         plt.plot(epochs, test_tape[0], color="purple", label="Test set")
     plt.xlabel("Epochs")
     plt.legend(loc='best')
@@ -82,7 +82,7 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_fil
     plt.title("Accuracy", fontweight='bold')
     plt.plot(epochs, train_tape[1], color="blue", label="Training set, best={0:.2f}, last={1:.2f}".format(best_train_acc, last_train_acc))
     plt.plot(epochs, valid_tape[1], color="orange", label="Validation set, best={0:.2f}, last={1:.2f}".format(best_valid_acc, last_valid_acc))
-    if show_test:
+    if config['show_test']:
         plt.plot(epochs, test_tape[1], color="purple", label="Test set, best={0:.2f}, last={1:.2f}".format(best_test_acc, last_test_acc))
     plt.ylim(0, 100)
     plt.xlabel("Epochs")
@@ -97,7 +97,7 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_fil
     log_file = os.path.join(saving_dir, 'log_' + exp_name + '.pkl')
     with open(log_file, 'wb') as f:
         pickle.dump({
-            'data_file': data_file,
+            'config': config,
             'train_tape': train_tape,
             'valid_tape': valid_tape,
             'test_tape': test_tape
@@ -111,16 +111,16 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, data_fil
     return
 
 
-def update_comparative_chart(result_dir, show_test):
+def update_comparative_chart(save_dir, show_test):
     
     all_configs_results = []
 
     # Finds the right folders
-    result_folders = os.listdir(result_dir)
+    result_folders = os.listdir(save_dir)
 
     for thing in result_folders:
         
-        if len(thing.split('.')) == 1 and (thing.startswith('config') or thing.startswith('sample')): # if thing is a folder
+        if os.path.isdir(os.path.join(save_dir, thing)): # if thing is a folder
 
             folder = thing
             if folder.startswith('config'):
@@ -129,10 +129,10 @@ def update_comparative_chart(result_dir, show_test):
             elif folder.startswith('sample'):
                 things_name = 'samples'
                 config_number = int(folder.lstrip('sample'))
-            files = os.listdir(os.path.join(result_dir, folder))
+            files = os.listdir(os.path.join(save_dir, folder))
             for f in files:
                 if f.startswith('log_'):
-                    log_file = os.path.join(result_dir, folder, f)
+                    log_file = os.path.join(save_dir, folder, f)
 
             # If the log_file exists, extracts the recording tapes it contains
             if os.path.exists(log_file):
@@ -140,7 +140,7 @@ def update_comparative_chart(result_dir, show_test):
                 with open(log_file, 'rb') as f:
                     log_data = pickle.load(f)
                 
-                data_file = log_data['data_file']
+                config = log_data['config']
                 
                 train_tape = log_data['train_tape']
                 valid_tape = log_data['valid_tape']
@@ -208,9 +208,63 @@ def update_comparative_chart(result_dir, show_test):
     if show_test:
         autolabel(bars3)
 
-    plt.savefig(os.path.join(result_dir, 'results.png'))
+    plt.savefig(os.path.join(save_dir, 'results.png'))
     plt.close()
 
     print("Comparative chart has been updated")
 
     return
+
+
+def get_all_logs_files(save_dir):
+    """
+    :param save_dir: directory containing all the different experiment directories
+    :return: all_logs, a list of LogFile objects containing filename and tapes
+    """
+
+    all_logs = []
+    result_folders = os.listdir(save_dir)
+
+    class LogFile(object):
+
+        def __init__(self, name, train_tape, valid_tape, test_tape, config):
+
+            self.name = name
+
+            self.train_tape = train_tape
+            self.valid_tape = valid_tape
+            self.test_tape = test_tape
+
+            self.config = config
+
+    for thing in result_folders:
+
+        if os.path.isdir(os.path.join(save_dir, thing)): # if thing is a folder
+
+            folder = thing
+            if folder.startswith('config'):
+                things_name = 'configs'
+                config_number = int(folder.lstrip('config'))
+            elif folder.startswith('sample'):
+                things_name = 'samples'
+                config_number = int(folder.lstrip('sample'))
+            files = os.listdir(os.path.join(save_dir, folder))
+            for f in files:
+                if f.startswith('log_'):
+                    log_filename = os.path.join(save_dir, folder, f)
+
+            # If the log_file exists, extracts the recording tapes it contains
+            if os.path.exists(log_filename):
+
+                with open(log_filename, 'rb') as f:
+                    log_data = pickle.load(f)
+
+                config = log_data['config']
+
+                train_tape = log_data['train_tape']
+                valid_tape = log_data['valid_tape']
+                test_tape  = log_data['test_tape']
+
+                all_logs.append(LogFile(log_filename, train_tape, valid_tape, test_tape, config))
+
+    return all_logs
