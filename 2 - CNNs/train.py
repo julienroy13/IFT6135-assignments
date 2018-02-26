@@ -21,7 +21,7 @@ torch.manual_seed(1234)
 
 def train_model(config, gpu_id, save_dir, exp_name):
     # Instantiating the model
-    model = MLP(784, config["hidden_layers"], 10, config["activation"], config["initialization"], verbose=True)
+    model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], verbose=True)
 
     # Loading the MNIST dataset
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
@@ -58,7 +58,9 @@ def train_model(config, gpu_id, save_dir, exp_name):
     loader = torch.utils.data.DataLoader(train_set, batch_size=config["mb_size"], shuffle=True)
 
     # Optimizer and Loss Function
-    optimizer = optim.SGD(model.parameters(), lr=config['lr'], momentum=config['momentum'])
+    optimizer = optim.SGD(model.parameters(), lr=config['lr'],
+                                              momentum=config['momentum'],
+                                              weight_decay=config['L2_hyperparam'])
     loss_fn = nn.NLLLoss()
 
     # Records the model's performance
@@ -122,13 +124,6 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
             # Computes the loss
             loss = loss_fn(output, y_batch)
-
-            #print(i, loss)
-
-            #if i % 10 == 0:
-             #   print("LOSS : {}".format(loss))
-              #  print("MAX : {}".format(torch.max(output)[0]))
-               # time.sleep(2)
 
             # Backpropagates to compute the gradients
             loss.backward()

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import operator
 
-def load_mnist(data_file):
+def load_mnist(data_file, data_format):
 
     with open(data_file, "rb") as f:
         mnist = pickle.load(f)
@@ -25,6 +25,15 @@ def load_mnist(data_file):
         x_train = x_train / 255.
         x_valid = x_valid / 255.
         x_test = x_test / 255.
+
+    # Makes sure the data examples are formatted as vectors
+    assert len(x_train.shape) == 1, "The data from the pkl file should be formatted as vector"
+
+    # Reshapes the data examples from their flattened vector-form to array-like images
+    if data_format == "array":
+        x_train = np.reshape(x_train, (x_train.shape[0], 28, 28))
+        x_valid = np.reshape(x_valid, (x_train.shape[0], 28, 28))
+        x_test = np.reshape(x_test, (x_train.shape[0], 28, 28))
 
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 

@@ -29,138 +29,25 @@ myConfigs = (CarefulDict([
     
     (0, {
         "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector", # "vector" or "array"
         "data_reduction": 1.0, # 0.01, 0.02, 0.05, 0.1, 1.0
         
-        "hidden_layers": [512, 512],
-        "activation": "relu", # "relu", "sigmoid", "tanh"
-        "initialization": "glorot", # "default", "glorot", "zero", "normal"
+        "hidden_layers": [800, 800],
+        "nonlinearity": "relu", # "relu", "sigmoid", "tanh"
+        "initialization": "glorot", # "standard", "glorot", "zero", "normal"
         
-        "mb_size": 100,
+        "mb_size": 64,
         "max_epochs": 100,
 
-        "lr": 0.01,
+        "lr": 0.02,
         "momentum": 0.0,
+
+        "is_early_stopping" : False, #True or False
+        "L2_hyperparam" : 2.5,
 
         "show_test": False,
         "save_plots": True
         }
     ),
-
-    (1, {
-        "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
-
-        "hidden_layers": [512, 512],
-        "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "default",  # "default", "glorot", "zero", "normal"
-
-        "mb_size": 100,
-        "max_epochs": 100,
-
-        "lr": 0.01,
-        "momentum": 0.0,
-
-        "show_test": False,
-        "save_plots": True
-        }
-    ),
-
-    (2, {
-        "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
-
-        "hidden_layers": [512, 512],
-        "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "normal",  # "default", "glorot", "zero", "normal"
-
-        "mb_size": 100,
-        "max_epochs": 100,
-
-        "lr": 0.01,
-        "momentum": 0.0,
-
-        "show_test": False,
-        "save_plots": True
-        }
-    ),
-
-    (3, {
-        "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
-
-        "hidden_layers": [512, 512],
-        "activation": "relu",  # "relu", "sigmoid"
-        "initialization": "zero",  # "default", "glorot", "zero", "normal"
-
-        "mb_size": 100,
-        "max_epochs": 100,
-
-        "lr": 0.01,
-        "momentum": 0.0,
-
-        "show_test": False,
-        "save_plots": True
-    }
-     ),
-
-    # OPTIMAL
-    (4, {
-        "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
-
-        "hidden_layers": [512, 512],
-        "activation": "sigmoid",  # "relu", "sigmoid"
-        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
-
-        "mb_size": 40,
-        "max_epochs": 100,
-
-        "lr": 1.0,
-        "momentum": 0.5,
-
-        "show_test": False,
-        "save_plots": True
-    }
-     ),
-
-    # OPTIMAL - doubled capacity
-    (5, {
-        "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
-
-        "hidden_layers": [1024, 1024],
-        "activation": "sigmoid",  # "relu", "sigmoid"
-        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
-
-        "mb_size": 40,
-        "max_epochs": 100,
-
-        "lr": 1.0,
-        "momentum": 0.5,
-
-        "show_test": False,
-        "save_plots": True
-    }
-     ),
-
-    # OPTIMAL - sanity test
-    (6, {
-        "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
-
-        "hidden_layers": [512, 512],
-        "activation": "sigmoid",  # "relu", "sigmoid"
-        "initialization": "glorot",  # "default", "glorot", "zero", "normal"
-
-        "mb_size": 40,
-        "max_epochs": 100,
-
-        "lr": 1.0,
-        "momentum": 0.5,
-
-        "show_test": False,
-        "save_plots": True
-    }
-     ),
 
 ]))
