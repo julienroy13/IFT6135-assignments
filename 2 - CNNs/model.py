@@ -6,7 +6,7 @@ import pdb
 
 class MLP(nn.Module):
 
-    def __init__(self, inp_size, h_sizes, out_size, nonlinearity, init_type, verbose=False):
+    def __init__(self, inp_size, h_sizes, out_size, nonlinearity, init_type, dropout, verbose=False):
 
         super(MLP, self).__init__()
 
@@ -35,20 +35,26 @@ class MLP(nn.Module):
         # Initializes the parameters
         self.init_parameters(init_type)
 
+        # Dropout
+        self.p = dropout
+
         if verbose:
             print('\nModel Info ------------')
             print(self)
             print("Total number of parameters : {:.2f} M".format(self.get_number_of_params() / 1e6))
             print('---------------------- \n')
 
-    def forward(self, x):
+    def forward(self, x, is_training=False):
 
         # Feedforward
         for layer in self.hidden:
             a = layer(x)
             x = self.act_fn(a)
 
-        output = F.log_softmax(self.out(x), dim=1)
+        # Dropout on last hidden layer
+        drop = F.dropout(x, training=is_training, p=self.p)
+
+        output = F.log_softmax(self.out(drop), dim=1)
 
         return output
 

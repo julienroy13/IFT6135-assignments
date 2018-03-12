@@ -21,7 +21,7 @@ torch.manual_seed(1234)
 
 def train_model(config, gpu_id, save_dir, exp_name):
     # Instantiating the model
-    model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], verbose=True)
+    model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], config["dropout"], verbose=True)
 
     # Loading the MNIST dataset
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"], data_format=config["data_format"])
@@ -79,7 +79,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
                 data = Variable(data)
                 labels = Variable(labels)
 
-        output = model(data)
+        output = model(data, is_training=False)
         loss = loss_fn(output, labels)
         prediction = torch.max(output.data, 1)[1]
         accuracy = (prediction.eq(labels.data).sum() / labels.size(0)) * 100
@@ -126,7 +126,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
             optimizer.zero_grad()
 
             # Feedforward through the model
-            output = model(x_batch)
+            output = model(x_batch, is_training=True)
 
             # Computes the loss
             loss = loss_fn(output, y_batch)
