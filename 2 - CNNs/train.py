@@ -60,7 +60,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
     # Optimizer and Loss Function
     optimizer = optim.SGD(model.parameters(), lr=config['lr'],
                                               momentum=config['momentum'],
-                                              weight_decay=config['L2_hyperparam'] / config['mb_size'])
+                                              weight_decay=config['L2_hyperparam'] * (config['mb_size'] / x_train.size()[0]))
     loss_fn = nn.NLLLoss()
 
     # Records the model's performance
@@ -103,7 +103,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     # Record weights L2 norm
     weights_L2_norm = model.get_weights_L2_norm()
-    weights_tape.append(weights_L2_norm)
+    weights_tape.append(float(weights_L2_norm.data.cpu().numpy()))
 
     print("BEFORE TRAINING \nLoss : {0:.3f} \nAcc : {1:.3f}".format(valid_loss, valid_acc))
 
@@ -154,7 +154,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
         # Record weights L2 norm
         weights_L2_norm = model.get_weights_L2_norm()
-        weights_tape.append(weights_L2_norm)
+        weights_tape.append(float(weights_L2_norm.data.cpu().numpy()))
 
         print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
         print("Time : {0:.2f}".format(time.time() - start))

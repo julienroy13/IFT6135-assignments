@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import math
@@ -84,13 +85,12 @@ class MLP(nn.Module):
 
     def get_weights_L2_norm(self):
 
-        weights_L2_norm = 0
+        weights_L2_norm_squared = 0
 
-        pdb.set_trace()
         for params in self.parameters():
-            weights_L2_norm += params.norm(2)
+            weights_L2_norm_squared += torch.sum(params**2)
 
-        return weights_L2_norm
+        return torch.sqrt(weights_L2_norm_squared)
 
     def name(self):
         return "MLP"
@@ -102,9 +102,21 @@ class CNN(nn.Module):
 
     def __init__(self, inp_size, h_sizes, out_size, nonlinearity, init_type, verbose=False):
 
-        super(MLP, self).__init__()
-
-        #TODO
+        super(CNN, self).__init__()
+        
+        # Conv Layer 1
+        self.conv1 = nn.Conv2d(
+            in_channels=in_channels, out_channels=out_channels,
+            kernel_size=(3, 3), stride=stride, padding=1, bias=False
+        )
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        
+        # Conv Layer 2
+        self.conv2 = nn.Conv2d(
+            in_channels=out_channels, out_channels=out_channels,
+            kernel_size=(3, 3), stride=1, padding=1, bias=False
+        )
+        self.bn2 = nn.BatchNorm2d(out_channels)
 
         if verbose:
             print('\nModel Info ------------')
@@ -113,12 +125,12 @@ class CNN(nn.Module):
             print('---------------------- \n')
 
     def forward(self, x):
-
-        # Feedforward
-        #TODO
-        pass
-
-        return
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)
+        out = F.relu(out)
+        
+        return out
 
     def init_parameters(self, init_type):
 

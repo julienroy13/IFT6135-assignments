@@ -51,7 +51,7 @@ myConfigs = (CarefulDict([
         }
     ),
 
-    (1, { # Imposed hyperparams for Assignment 2, Q1-a
+    (1, { # Imposed hyperparams for Assignment 2, Q1-a (WITH L2-REG)
         "data_file": os.path.join("data", "mnist_data.pkl"),
         "data_format": "vector",  # "vector" or "array"
         "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
@@ -73,5 +73,99 @@ myConfigs = (CarefulDict([
         "save_plots": True
     }
      ),
+
+    (2, { # Imposed hyperparams for Assignment 2, Q1-a (NO L2-REG)
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [800, 800],
+        "nonlinearity": "relu",  # "relu", "sigmoid", "tanh"
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
+        "mb_size": 64,
+        "max_epochs": 100,
+
+        "lr": 0.02,
+        "momentum": 0.0,
+
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 0,  # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+    (3, { # Imposed hyperparams for Assignment 2, Q1-a (WITH L2-REG, sigmoid)
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [800, 800],
+        "nonlinearity": "sigmoid",  # "relu", "sigmoid", "tanh"
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
+        "mb_size": 64,
+        "max_epochs": 100,
+
+        "lr": 0.02,
+        "momentum": 0.0,
+
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 2.5,  # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+    (4, { # Imposed hyperparams for Assignment 2, Q1-a (NO L2-REG, sigmoid)
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [800, 800],
+        "nonlinearity": "sigmoid",  # "relu", "sigmoid", "tanh"
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
+        "mb_size": 64,
+        "max_epochs": 100,
+
+        "lr": 0.02,
+        "momentum": 0.0,
+
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 0,  # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+    (5, { # Imposed hyperparams for Assignment 2, Q1-a (WITH DROPOUT)
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [800, 800],
+        "nonlinearity": "relu",  # "relu", "sigmoid", "tanh"
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
+        "mb_size": 64,
+        "max_epochs": 100,
+
+        "lr": 0.02,
+        "momentum": 0.0,
+
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 0,  # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": False,
+        "save_plots": True
+    }
+     ),
+
+
 
 ]))
