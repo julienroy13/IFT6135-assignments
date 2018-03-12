@@ -60,7 +60,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
     # Optimizer and Loss Function
     optimizer = optim.SGD(model.parameters(), lr=config['lr'],
                                               momentum=config['momentum'],
-                                              weight_decay=config['L2_hyperparam'])
+                                              weight_decay=config['L2_hyperparam'] / config['mb_size'])
     loss_fn = nn.NLLLoss()
 
     # Records the model's performance

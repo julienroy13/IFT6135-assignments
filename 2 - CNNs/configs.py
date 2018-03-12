@@ -43,7 +43,7 @@ myConfigs = (CarefulDict([
         "momentum": 0.0,
 
         "is_early_stopping" : False, #True or False
-        "L2_hyperparam" : 2.5,
+        "L2_hyperparam" : 2.5, # L2 hyperparameter for a full batch (entire dataset)
 
         "show_test": False,
         "save_plots": True
