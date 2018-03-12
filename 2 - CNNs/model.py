@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import math
+import pdb
 
 class MLP(nn.Module):
 
@@ -25,7 +26,7 @@ class MLP(nn.Module):
             self.act_fn = F.tanh
 
         else:
-            raise ValueError('Specified activation function "{}" is not recognized.'.format(act_fn))
+            raise ValueError('Specified activation function "{}" is not recognized.'.format(nonlinearity))
 
         # Output layer
         self.out = nn.Linear(h_sizes[-1], out_size)
@@ -58,7 +59,7 @@ class MLP(nn.Module):
                 nn.init.constant(module.bias, 0)
 
                 if init_type == "glorot":
-                    nn.init.xavier_normal(module.weight, gain=nn.calculate_gain(self.nonlenarity))
+                    nn.init.xavier_normal(module.weight, gain=nn.init.calculate_gain(self.nonlenarity))
 
                 elif init_type == "standard":
                     stdv = 1. / math.sqrt(module.weight.size(1))
@@ -80,6 +81,16 @@ class MLP(nn.Module):
             total_params += total_size
 
         return total_params
+
+    def get_weights_L2_norm(self):
+
+        weights_L2_norm = 0
+
+        pdb.set_trace()
+        for params in self.parameters():
+            weights_L2_norm += params.norm(2)
+
+        return weights_L2_norm
 
     def name(self):
         return "MLP"
@@ -105,8 +116,9 @@ class CNN(nn.Module):
 
         # Feedforward
         #TODO
+        pass
 
-        return output
+        return
 
     def init_parameters(self, init_type):
 

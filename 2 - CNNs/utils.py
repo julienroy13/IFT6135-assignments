@@ -27,7 +27,7 @@ def load_mnist(data_file, data_format):
         x_test = x_test / 255.
 
     # Makes sure the data examples are formatted as vectors
-    assert len(x_train.shape) == 1, "The data from the pkl file should be formatted as vector"
+    assert len(x_train.shape) == 2, "The data from the pkl file should be formatted as vector"
 
     # Reshapes the data examples from their flattened vector-form to array-like images
     if data_format == "array":
@@ -55,7 +55,7 @@ def save_model(model):
     pass # TODO
     return
 
-def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, config):
+def save_results(train_tape, valid_tape, test_tape, weights_tape, save_dir, exp_name, config):
 
     # Creates the folder if necessary
     saving_dir = os.path.join(save_dir, exp_name)
@@ -109,7 +109,8 @@ def save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, config):
             'config': config,
             'train_tape': train_tape,
             'valid_tape': valid_tape,
-            'test_tape': test_tape
+            'test_tape': test_tape,
+            'weights_tape': weights_tape
             }, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     #Prints out the test accuracy at epoch=best_valid_accuracy

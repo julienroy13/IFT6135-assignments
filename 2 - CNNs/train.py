@@ -24,7 +24,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
     model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], verbose=True)
 
     # Loading the MNIST dataset
-    x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"])
+    x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"], data_format=config["data_format"])
 
     if config['data_reduction'] != 1.:
         x_train, y_train = utils.reduce_trainset_size(x_train, y_train, config['data_reduction'])
@@ -67,6 +67,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
     train_tape = [[],[]]
     valid_tape = [[],[]]
     test_tape = [[],[]]
+    weights_tape = []
 
     def evaluate(data, labels):
 
@@ -100,9 +101,14 @@ def train_model(config, gpu_id, save_dir, exp_name):
     test_tape[0].append(test_loss)
     test_tape[1].append(test_acc)
 
+    # Record weights L2 norm
+    weights_L2_norm = model.get_weights_L2_norm()
+    weights_tape.append(weights_L2_norm)
+
     print("BEFORE TRAINING \nLoss : {0:.3f} \nAcc : {1:.3f}".format(valid_loss, valid_acc))
 
     # TRAINING LOOP
+    #TODO : EARLY STOPPING
     for epoch in range(1, config["max_epochs"]):
         start = time.time()
         for i,(x_batch, y_batch) in enumerate(loader):
@@ -146,16 +152,19 @@ def train_model(config, gpu_id, save_dir, exp_name):
         test_tape[0].append(test_loss)
         test_tape[1].append(test_acc)
 
+        # Record weights L2 norm
+        weights_L2_norm = model.get_weights_L2_norm()
+        weights_tape.append(weights_L2_norm)
+
         print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
         print("Time : {0:.2f}".format(time.time() - start))
-
 
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     # Saves the graphs
-    utils.save_results(train_tape, valid_tape, test_tape, save_dir, exp_name, config)
+    utils.save_results(train_tape, valid_tape, test_tape, weights_tape, save_dir, exp_name, config)
     utils.update_comparative_chart(save_dir, config['show_test'])
 
     return

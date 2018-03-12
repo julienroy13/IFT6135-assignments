@@ -26,28 +26,52 @@ class CarefulDict(dict):
 
 
 myConfigs = (CarefulDict([
-    
-    (0, {
+
+    (0, { # Optimal config found by random-serach for [784, 512, 512, 10] MLP
         "data_file": os.path.join("data", "mnist_data.pkl"),
         "data_format": "vector", # "vector" or "array"
         "data_reduction": 1.0, # 0.01, 0.02, 0.05, 0.1, 1.0
         
-        "hidden_layers": [800, 800],
-        "nonlinearity": "relu", # "relu", "sigmoid", "tanh"
+        "hidden_layers": [512, 512],
+        "nonlinearity": "sigmoid", # "relu", "sigmoid", "tanh"
         "initialization": "glorot", # "standard", "glorot", "zero", "normal"
         
+        "mb_size": 40,
+        "max_epochs": 100,
+        "patience": 5, # For early stopping, if no early stopping, set patience to None TODO
+
+        "lr": 1.0,
+        "momentum": 0.5,
+
+        "is_early_stopping" : False, #True or False
+        "L2_hyperparam" : 0, # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": False,
+        "save_plots": True
+        }
+    ),
+
+    (1, { # Imposed hyperparams for Assignment 2, Q1-a
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "hidden_layers": [800, 800],
+        "nonlinearity": "relu",  # "relu", "sigmoid", "tanh"
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
         "mb_size": 64,
         "max_epochs": 100,
 
         "lr": 0.02,
         "momentum": 0.0,
 
-        "is_early_stopping" : False, #True or False
-        "L2_hyperparam" : 2.5, # L2 hyperparameter for a full batch (entire dataset)
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 2.5,  # L2 hyperparameter for a full batch (entire dataset)
 
         "show_test": False,
         "save_plots": True
-        }
-    ),
+    }
+     ),
 
 ]))
