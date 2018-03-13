@@ -16,7 +16,7 @@ import pdb
 
 import numpy as np
 
-torch.manual_seed(1234)
+torch.manual_seed(123)
 
 
 class MLP(nn.Module):
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     test_acc_i = evaluate(x_test, y_test)
     print("Model Restored\nPrecision on test set : {}".format(test_acc_i))
 
-    N_s = range(10, 101, 10)
+    N_s = [1, 2, 3, 4, 5] + list(range(10, 101, 5))
 
     experiment_ii = []
     experiment_iii = []
