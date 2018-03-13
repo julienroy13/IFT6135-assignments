@@ -94,7 +94,7 @@ class MLP(nn.Module):
                 x = self.act_fn(a)
 
             # Dropout on last hidden layer
-            drop = F.dropout(x, training=False, p=self.p)
+            drop = F.dropout(x, training=True, p=self.p)
             pre_softmax = self.out(drop)
             return pre_softmax
 
@@ -163,5 +163,35 @@ if __name__ == "__main__":
     x_test = Variable(torch.from_numpy(x_test))
     y_test = Variable(torch.from_numpy(y_test))
 
-    N = range(10, 110, 10)
+    def evaluate(data, labels):
+        output = model(data, is_training=False)
+        prediction = torch.max(output.data, 1)[1]
+        accuracy = (prediction.eq(labels.data).sum() / labels.size(0)) * 100
+        return accuracy
+
+    test_acc_i = evaluate(x_test, y_test)
+    print("Model Restored\nPrecision on test set : {}".format(test_acc_i))
+    """
+    N_s = range(10, 110, 10)
+
+    experiment_i = []
+    experiment_ii = []
+    experiment_iii = []
+
+    for N in N_s:
+
+        # Experiment ii)
+        drop_ensemble = torch.zeros(x_train.size()[0], 800, N)
+        for j in range(N):
+            drop = model.forward_until_last_hidden(x_test, part=1)
+            drop_ensemble[:, :, j] = drop
+
+        drop_ensemble = torch.mean(drop_ensemble, dim=2)
+        output = model.forward_until_last_hidden(drop_ensemble, part=2)
+
+        # Experiment iii)
+        for j in range(N):
+    """
+
+
 
