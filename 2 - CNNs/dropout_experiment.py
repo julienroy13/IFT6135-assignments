@@ -152,6 +152,8 @@ class MLP(nn.Module):
 
 if __name__ == "__main__":
 
+    start = time.time()
+
     config_number = 3
     config = myConfigs[config_number]
 
@@ -173,15 +175,18 @@ if __name__ == "__main__":
     test_acc_i = evaluate(x_test, y_test)
     print("Model Restored\nPrecision on test set : {}".format(test_acc_i))
 
-    N_s = range(10, 110, 10)
+    N_s = [1, 3, 5]
+    #N_s = range(10, 110, 10)
 
     experiment_ii = []
     experiment_iii = []
 
     for N in N_s:
 
+        print("\n----------\nN={}\n".format(N))
+
         # Experiment ii)
-        pre_softmax_ensemble = torch.zeros(x_test.size()[0], 10, N)
+        pre_softmax_ensemble = Variable(torch.zeros(x_test.size()[0], 10, N))
         for j in range(N):
             pre_softmax = model.forward_until_pre_softmax(x_test, part=1)
             pre_softmax_ensemble[:, :, j] = pre_softmax
@@ -193,7 +198,7 @@ if __name__ == "__main__":
         experiment_ii.append(accuracy)
 
         # Experiment iii)
-        post_softmax_ensemble = torch.zeros(x_test.size()[0], 10, N)
+        post_softmax_ensemble = Variable(torch.zeros(x_test.size()[0], 10, N))
         for j in range(N):
             post_softmax = model(x_test, is_training=True)
             post_softmax_ensemble[:, :, j] = post_softmax
@@ -204,11 +209,13 @@ if __name__ == "__main__":
         accuracy = (prediction.eq(y_test.data).sum() / y_test.size(0)) * 100
         experiment_iii.append(accuracy)
 
-    with open(os.path.join("results", "config"+str(config_number)), 'wb') as f:
+    with open(os.path.join("results", "config"+str(config_number), "dropout_results.pkl"), 'wb') as f:
         pickle.dump({
             'test_acc_i': test_acc_i,
             'experiment_ii': experiment_ii,
             'experiment_iii': experiment_iii,
             }, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print("\nTOTAL TIME : {}".format(time.time() - start))
 
 
