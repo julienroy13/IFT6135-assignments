@@ -108,6 +108,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
     print("BEFORE TRAINING \nLoss : {0:.3f} \nAcc : {1:.3f}".format(valid_loss, valid_acc))
 
     # TRAINING LOOP
+    best_valid_acc = 0
     #TODO : EARLY STOPPING
     for epoch in range(1, config["max_epochs"]):
         start = time.time()
@@ -159,6 +160,11 @@ def train_model(config, gpu_id, save_dir, exp_name):
         print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
         print("Time : {0:.2f}".format(time.time() - start))
 
+        # Saves the model
+        if valid_acc > best_valid_acc:
+            print("NEW BEST MODEL")
+            torch.save(model.state_dict(), os.path.join(save_dir, exp_name, "model"))
+            best_valid_acc = valid_acc
 
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -166,9 +172,6 @@ def train_model(config, gpu_id, save_dir, exp_name):
     # Saves the graphs
     utils.save_results(train_tape, valid_tape, test_tape, weights_tape, save_dir, exp_name, config)
     utils.update_comparative_chart(save_dir, config['show_test'])
-
-    # Saves the model
-    torch.save(model.state_dict(), os.path.join(save_dir, exp_name, "model"))
 
     return
 
