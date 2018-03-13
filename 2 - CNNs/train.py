@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 import torch.optim as optim
 import utils
-from model import MLP
+from model import MLP, CNN
 
 from configs import myConfigs
 import os
@@ -166,6 +166,9 @@ def train_model(config, gpu_id, save_dir, exp_name):
     # Saves the graphs
     utils.save_results(train_tape, valid_tape, test_tape, weights_tape, save_dir, exp_name, config)
     utils.update_comparative_chart(save_dir, config['show_test'])
+
+    # Saves the model
+    torch.save(model.state_dict(), os.path.join(save_dir, exp_name, "model"))
 
     return
 
