@@ -154,17 +154,19 @@ if __name__ == "__main__":
 
     start = time.time()
 
+    gpu_id = 0
     config_number = 3
     config = myConfigs[config_number]
 
     model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], config["dropout"], verbose=True)
     model.load_state_dict(torch.load(os.path.join("results", "config"+str(config_number), "model")))
+    model.cuda(gpu_id)
 
     # Loading the MNIST dataset
     _, _, _, _, x_test, y_test = utils.load_mnist(config["data_file"], data_format=config["data_format"])
 
-    x_test = Variable(torch.from_numpy(x_test))
-    y_test = Variable(torch.from_numpy(y_test))
+    x_test = Variable(torch.from_numpy(x_test), volatile=True).cuda(gpu_id)
+    y_test = Variable(torch.from_numpy(y_test), volatile=True).cuda(gpu_id)
 
     def evaluate(data, labels):
         output = model(data, is_training=False)
@@ -175,21 +177,20 @@ if __name__ == "__main__":
     test_acc_i = evaluate(x_test, y_test)
     print("Model Restored\nPrecision on test set : {}".format(test_acc_i))
 
-    N_s = [1, 3, 5]
-    #N_s = range(10, 110, 10)
+    N_s = range(10, 101, 10)
 
     experiment_ii = []
     experiment_iii = []
+    experiment_iv = []
 
     for N in N_s:
 
         print("\n----------\nN={}\n".format(N))
 
-        # Experiment ii)
-        pre_softmax_ensemble = Variable(torch.zeros(x_test.size()[0], 10, N))
+        # Experiment ii) - Pre-softmax ensemble
+        pre_softmax_ensemble = Variable(torch.zeros(x_test.size()[0], 10, N), volatile=True).cuda(gpu_id)
         for j in range(N):
-            pre_softmax = model.forward_until_pre_softmax(x_test, part=1)
-            pre_softmax_ensemble[:, :, j] = pre_softmax
+            pre_softmax_ensemble[:, :, j] = model.forward_until_pre_softmax(x_test, part=1)
 
         pre_softmax_avg = torch.mean(pre_softmax_ensemble, dim=2)
         output = model.forward_until_pre_softmax(pre_softmax_avg, part=2)
@@ -197,11 +198,10 @@ if __name__ == "__main__":
         accuracy = (prediction.eq(y_test.data).sum() / y_test.size(0)) * 100
         experiment_ii.append(accuracy)
 
-        # Experiment iii)
-        post_softmax_ensemble = Variable(torch.zeros(x_test.size()[0], 10, N))
+        # Experiment iii) - Post-softmax ensemble
+        post_softmax_ensemble = Variable(torch.zeros(x_test.size()[0], 10, N), volatile=True).cuda(gpu_id)
         for j in range(N):
-            post_softmax = model(x_test, is_training=True)
-            post_softmax_ensemble[:, :, j] = post_softmax
+            post_softmax_ensemble[:, :, j] = model(x_test, is_training=True)
 
         post_softmax_avg = torch.mean(post_softmax_ensemble, dim=2)
         output = post_softmax_avg
@@ -209,11 +209,26 @@ if __name__ == "__main__":
         accuracy = (prediction.eq(y_test.data).sum() / y_test.size(0)) * 100
         experiment_iii.append(accuracy)
 
+        # Experiment iv) - Voting ensemble
+        votes = Variable(torch.zeros(x_test.size()[0], 10), volatile=True).cuda(gpu_id)
+        for j in range(N):
+            output = model(x_test, is_training=True)
+
+            prediction = torch.max(output.data, 1)[1]
+            votes[range(10000), prediction] += 1
+
+        final_prediction = torch.max(votes.data, 1)[1]
+        accuracy = (final_prediction.eq(y_test.data).sum() / y_test.size(0)) * 100
+        experiment_iv.append(accuracy)
+
+
     with open(os.path.join("results", "config"+str(config_number), "dropout_results.pkl"), 'wb') as f:
         pickle.dump({
+            'N_s': N_s,
             'test_acc_i': test_acc_i,
             'experiment_ii': experiment_ii,
             'experiment_iii': experiment_iii,
+            'experiment_iv': experiment_iv
             }, f, protocol=pickle.HIGHEST_PROTOCOL)
 
     print("\nTOTAL TIME : {}".format(time.time() - start))
