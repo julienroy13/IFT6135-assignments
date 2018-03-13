@@ -16,7 +16,7 @@ class MLP(nn.Module):
             self.hidden.append(nn.Linear(h_sizes[k], h_sizes[k+1]))
 
         # Activation function
-        self.nonlenarity = nonlinearity
+        self.nonlinearity = nonlinearity
         if nonlinearity == "relu":
             self.act_fn = F.relu
 
@@ -29,14 +29,14 @@ class MLP(nn.Module):
         else:
             raise ValueError('Specified activation function "{}" is not recognized.'.format(nonlinearity))
 
+        # Dropout layer
+        self.drop = nn.Dropout(p=dropout)
+
         # Output layer
         self.out = nn.Linear(h_sizes[-1], out_size)
 
         # Initializes the parameters
         self.init_parameters(init_type)
-
-        # Dropout
-        self.p = dropout
 
         if verbose:
             print('\nModel Info ------------')
@@ -44,7 +44,7 @@ class MLP(nn.Module):
             print("Total number of parameters : {:.2f} M".format(self.get_number_of_params() / 1e6))
             print('---------------------- \n')
 
-    def forward(self, x, is_training=False):
+    def forward(self, x):
 
         # Feedforward
         for layer in self.hidden:
@@ -52,7 +52,7 @@ class MLP(nn.Module):
             x = self.act_fn(a)
 
         # Dropout on last hidden layer
-        drop = F.dropout(x, training=is_training, p=self.p)
+        drop = self.drop(x)
 
         output = F.log_softmax(self.out(drop), dim=1)
 
@@ -66,7 +66,7 @@ class MLP(nn.Module):
                 nn.init.constant(module.bias, 0)
 
                 if init_type == "glorot":
-                    nn.init.xavier_normal(module.weight, gain=nn.init.calculate_gain(self.nonlenarity))
+                    nn.init.xavier_normal(module.weight, gain=nn.init.calculate_gain(self.nonlinearity))
 
                 elif init_type == "standard":
                     stdv = 1. / math.sqrt(module.weight.size(1))
@@ -106,7 +106,7 @@ class MLP(nn.Module):
 
 class CNN(nn.Module):
 
-    def __init__(self, inp_size, h_sizes, out_size, nonlinearity, init_type, is_batch_norm, verbose=False):
+    def __init__(self, init_type, is_batch_norm, verbose=False):
 
         super(CNN, self).__init__()
 
@@ -136,30 +136,34 @@ class CNN(nn.Module):
         # Batch Norm on?
         self.batch_norm_on = is_batch_norm
 
+        # Initializes the parameters
+        self.init_parameters(init_type)
+
         if verbose:
             print('\nModel Info ------------')
             print(self)
             print("Total number of parameters : {:.2f} M".format(self.get_number_of_params() / 1e6))
+            print("Batch Norm activated : {}".format(self.batch_norm_on))
             print('---------------------- \n')
 
     def forward(self, x):
         # Layer 1
-        out = F.relu(self.pool1(self.conv1(x)))
+        out = self.pool1(F.relu(self.conv1(x)))
         if self.batch_norm_on:
             out = self.bn1(out)
 
         # Layer 2
-        out = F.relu(self.pool2(self.conv2(out)))
+        out = self.pool2(F.relu(self.conv2(out)))
         if self.batch_norm_on:
             out = self.bn2(out)
 
         # Layer 3
-        out = F.relu(self.pool2(self.conv2(out)))
+        out = self.pool2(F.relu(self.conv2(out)))
         if self.batch_norm_on:
             out = self.bn3(out)
 
         # Layer 4
-        out = F.relu(self.pool2(self.conv2(out)))
+        out = self.pool2(F.relu(self.conv2(out)))
         if self.batch_norm_on:
             out = self.bn4(out)
 
@@ -176,7 +180,7 @@ class CNN(nn.Module):
                 nn.init.constant(module.bias, 0)
 
                 if init_type == "glorot":
-                    nn.init.xavier_normal(module.weight, gain=nn.calculate_gain(self.nonlenarity))
+                    nn.init.xavier_normal(module.weight, gain=nn.init.calculate_gain("relu"))
 
                 elif init_type == "standard":
                     stdv = 1. / math.sqrt(module.weight.size(1))

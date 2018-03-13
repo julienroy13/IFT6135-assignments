@@ -25,7 +25,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
     if model_type == "MLP":
         model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], config["dropout"], verbose=True)
     elif model_type == "CNN":
-        model = CNN()
+        model = CNN(config["initialization"], config["is_batch_norm"], verbose=True)
     else:
         raise ValueError('config["model_type"] not supported : {}'.format(model_type))
 
@@ -86,7 +86,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
                 data = Variable(data)
                 labels = Variable(labels)
 
-        output = model(data, is_training=False)
+        output = model(data)
         loss = loss_fn(output, labels)
         prediction = torch.max(output.data, 1)[1]
         accuracy = (prediction.eq(labels.data).sum() / labels.size(0)) * 100
@@ -134,7 +134,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
             optimizer.zero_grad()
 
             # Feedforward through the model
-            output = model(x_batch, is_training=True)
+            output = model(x_batch)
 
             # Computes the loss
             loss = loss_fn(output, y_batch)

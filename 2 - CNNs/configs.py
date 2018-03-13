@@ -125,7 +125,7 @@ myConfigs = (CarefulDict([
 
     (4, {  # Imposed hyperparams for Assignment 2, Q1-c (CNN and BatchNorm)
         "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_format": "vector",  # "vector" or "array"
+        "data_format": "array",  # "vector" or "array"
         "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
 
         "model_type": "CNN", # CNN or MLP
@@ -148,7 +148,7 @@ myConfigs = (CarefulDict([
 
     (5, {  # Imposed hyperparams for Assignment 2, Q1-c (CNN without BatchNorm)
         "data_file": os.path.join("data", "mnist_data.pkl"),
-        "data_format": "vector",  # "vector" or "array"
+        "data_format": "array",  # "vector" or "array"
         "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
 
         "model_type": "CNN",  # CNN or MLP

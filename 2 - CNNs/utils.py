@@ -5,6 +5,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import os
 import operator
+import pdb
 
 def load_mnist(data_file, data_format):
 
@@ -31,9 +32,9 @@ def load_mnist(data_file, data_format):
 
     # Reshapes the data examples from their flattened vector-form to array-like images
     if data_format == "array":
-        x_train = np.reshape(x_train, (x_train.shape[0], 28, 28))
-        x_valid = np.reshape(x_valid, (x_train.shape[0], 28, 28))
-        x_test = np.reshape(x_test, (x_train.shape[0], 28, 28))
+        x_train = np.expand_dims(np.reshape(x_train, (x_train.shape[0], 28, 28)), axis=1)
+        x_valid = np.expand_dims(np.reshape(x_valid, (x_valid.shape[0], 28, 28)), axis=1)
+        x_test = np.expand_dims(np.reshape(x_test, (x_test.shape[0], 28, 28)), axis=1)
 
     return x_train, y_train, x_valid, y_valid, x_test, y_test
 
