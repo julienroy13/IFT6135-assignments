@@ -99,7 +99,7 @@ myConfigs = (CarefulDict([
     }
      ),
 
-    (3, { # Imposed hyperparams for Assignment 2, Q1-a (WITH L2-REG, sigmoid)
+    (3, { # Imposed hyperparams for Assignment 2, Q1-b (Dropout)
         "data_file": os.path.join("data", "mnist_data.pkl"),
         "data_format": "vector",  # "vector" or "array"
         "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
@@ -114,6 +114,52 @@ myConfigs = (CarefulDict([
         "lr": 0.02,
         "momentum": 0.0,
         "dropout": 0.5, # put 0 for no dropout
+
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 0,  # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": True,
+        "save_plots": True
+    }
+     ),
+
+    (4, {  # Imposed hyperparams for Assignment 2, Q1-c (CNN and BatchNorm)
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "model_type": "CNN", # CNN or MLP
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
+        "mb_size": 64,
+        "max_epochs": 100,
+
+        "lr": 0.02,
+        "momentum": 0.0,
+        "is_batch_norm": True,
+
+        "is_early_stopping": False,  # True or False
+        "L2_hyperparam": 0,  # L2 hyperparameter for a full batch (entire dataset)
+
+        "show_test": True,
+        "save_plots": True
+    }
+     ),
+
+    (5, {  # Imposed hyperparams for Assignment 2, Q1-c (CNN without BatchNorm)
+        "data_file": os.path.join("data", "mnist_data.pkl"),
+        "data_format": "vector",  # "vector" or "array"
+        "data_reduction": 1.0,  # 0.01, 0.02, 0.05, 0.1, 1.0
+
+        "model_type": "CNN",  # CNN or MLP
+        "initialization": "glorot",  # "standard", "glorot", "zero", "normal"
+
+        "mb_size": 64,
+        "max_epochs": 100,
+
+        "lr": 0.02,
+        "momentum": 0.0,
+        "is_batch_norm": False,
 
         "is_early_stopping": False,  # True or False
         "L2_hyperparam": 0,  # L2 hyperparameter for a full batch (entire dataset)

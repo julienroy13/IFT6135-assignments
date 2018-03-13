@@ -21,7 +21,13 @@ torch.manual_seed(1234)
 
 def train_model(config, gpu_id, save_dir, exp_name):
     # Instantiating the model
-    model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], config["dropout"], verbose=True)
+    model_type = config.get('model_type', 'MLP')
+    if model_type == "MLP":
+        model = MLP(784, config["hidden_layers"], 10, config["nonlinearity"], config["initialization"], config["dropout"], verbose=True)
+    elif model_type == "CNN":
+        model = CNN()
+    else:
+        raise ValueError('config["model_type"] not supported : {}'.format(model_type))
 
     # Loading the MNIST dataset
     x_train, y_train, x_valid, y_valid, x_test, y_test = utils.load_mnist(config["data_file"], data_format=config["data_format"])
@@ -71,6 +77,7 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     def evaluate(data, labels):
 
+        model.eval()
         if not isinstance(data, Variable):
             if torch.cuda.is_available():
                 data = Variable(data).cuda(gpu_id)
@@ -109,9 +116,9 @@ def train_model(config, gpu_id, save_dir, exp_name):
 
     # TRAINING LOOP
     best_valid_acc = 0
-    #TODO : EARLY STOPPING
     for epoch in range(1, config["max_epochs"]):
         start = time.time()
+        model.train()
         for i,(x_batch, y_batch) in enumerate(loader):
 
             #pdb.set_trace()

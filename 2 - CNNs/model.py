@@ -106,23 +106,35 @@ class MLP(nn.Module):
 
 class CNN(nn.Module):
 
-    def __init__(self, inp_size, h_sizes, out_size, nonlinearity, init_type, verbose=False):
+    def __init__(self, inp_size, h_sizes, out_size, nonlinearity, init_type, is_batch_norm, verbose=False):
 
         super(CNN, self).__init__()
-        
-        # Conv Layer 1
-        self.conv1 = nn.Conv2d(
-            in_channels=in_channels, out_channels=out_channels,
-            kernel_size=(3, 3), stride=stride, padding=1, bias=False
-        )
-        self.bn1 = nn.BatchNorm2d(out_channels)
-        
-        # Conv Layer 2
-        self.conv2 = nn.Conv2d(
-            in_channels=out_channels, out_channels=out_channels,
-            kernel_size=(3, 3), stride=1, padding=1, bias=False
-        )
-        self.bn2 = nn.BatchNorm2d(out_channels)
+
+        # Layer 1
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=16, kernel_size=(3, 3), stride=1, padding=1)
+        self.pool1 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+        self.bn1 = nn.BatchNorm2d(16)
+
+        # Layer 2
+        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(3, 3), stride=1, padding=1)
+        self.pool2 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+        self.bn2 = nn.BatchNorm2d(32)
+
+        # Layer 3
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3), stride=1, padding=1)
+        self.pool3 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+        self.bn3 = nn.BatchNorm2d(64)
+
+        # Layer 4
+        self.conv4 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(3, 3), stride=1, padding=1)
+        self.pool4 = nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+        self.bn4 = nn.BatchNorm2d(128)
+
+        # Logistic Regression
+        self.fc = nn.Linear(128, 10)
+
+        # Batch Norm on?
+        self.batch_norm_on = is_batch_norm
 
         if verbose:
             print('\nModel Info ------------')
@@ -131,10 +143,28 @@ class CNN(nn.Module):
             print('---------------------- \n')
 
     def forward(self, x):
-        out = F.relu(self.bn1(self.conv1(x)))
-        out = self.bn2(self.conv2(out))
-        out += self.shortcut(x)
-        out = F.relu(out)
+        # Layer 1
+        out = F.relu(self.pool1(self.conv1(x)))
+        if self.batch_norm_on:
+            out = self.bn1(out)
+
+        # Layer 2
+        out = F.relu(self.pool2(self.conv2(out)))
+        if self.batch_norm_on:
+            out = self.bn2(out)
+
+        # Layer 3
+        out = F.relu(self.pool2(self.conv2(out)))
+        if self.batch_norm_on:
+            out = self.bn3(out)
+
+        # Layer 4
+        out = F.relu(self.pool2(self.conv2(out)))
+        if self.batch_norm_on:
+            out = self.bn4(out)
+
+        # Final classifier
+        out = F.log_softmax(self.fc(x), dim=1)
         
         return out
 
