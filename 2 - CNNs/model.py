@@ -158,17 +158,17 @@ class CNN(nn.Module):
             out = self.bn2(out)
 
         # Layer 3
-        out = self.pool2(F.relu(self.conv2(out)))
+        out = self.pool3(F.relu(self.conv3(out)))
         if self.batch_norm_on:
             out = self.bn3(out)
 
         # Layer 4
-        out = self.pool2(F.relu(self.conv2(out)))
+        out = self.pool4(F.relu(self.conv4(out)))
         if self.batch_norm_on:
             out = self.bn4(out)
 
         # Final classifier
-        out = F.log_softmax(self.fc(x), dim=1)
+        out = F.log_softmax(self.fc(out.squeeze()), dim=1)
         
         return out
 
@@ -202,6 +202,15 @@ class CNN(nn.Module):
             total_params += total_size
 
         return total_params
+
+    def get_weights_L2_norm(self):
+
+            weights_L2_norm_squared = 0
+
+            for params in self.parameters():
+                weights_L2_norm_squared += torch.sum(params**2)
+
+            return torch.sqrt(weights_L2_norm_squared)
 
     def name(self):
         return "CNN"

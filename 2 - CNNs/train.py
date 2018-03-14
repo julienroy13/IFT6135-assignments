@@ -42,11 +42,11 @@ def train_model(config, gpu_id, save_dir, exp_name):
         x_train = torch.from_numpy(x_train).cuda(gpu_id)
         y_train = torch.from_numpy(y_train).cuda(gpu_id)
 
-        x_valid = Variable(torch.from_numpy(x_valid)).cuda(gpu_id)
-        y_valid = Variable(torch.from_numpy(y_valid)).cuda(gpu_id)
+        x_valid = Variable(torch.from_numpy(x_valid), volatile=True).cuda(gpu_id)
+        y_valid = Variable(torch.from_numpy(y_valid), volatile=True).cuda(gpu_id)
 
-        x_test = Variable(torch.from_numpy(x_test)).cuda(gpu_id)
-        y_test = Variable(torch.from_numpy(y_test)).cuda(gpu_id)
+        x_test = Variable(torch.from_numpy(x_test), volatile=True).cuda(gpu_id)
+        y_test = Variable(torch.from_numpy(y_test), volatile=True).cuda(gpu_id)
         print("Running on GPU")
     else:
         x_train = torch.from_numpy(x_train)
@@ -80,8 +80,8 @@ def train_model(config, gpu_id, save_dir, exp_name):
         model.eval()
         if not isinstance(data, Variable):
             if torch.cuda.is_available():
-                data = Variable(data).cuda(gpu_id)
-                labels = Variable(labels).cuda(gpu_id)
+                data = Variable(data, volatile=True).cuda(gpu_id)
+                labels = Variable(labels, volatile=True).cuda(gpu_id)
             else:
                 data = Variable(data)
                 labels = Variable(labels)
@@ -92,6 +92,9 @@ def train_model(config, gpu_id, save_dir, exp_name):
         accuracy = (prediction.eq(labels.data).sum() / labels.size(0)) * 100
 
         return loss.data[0], accuracy
+
+    if not os.path.exists(os.path.join(save_dir, exp_name)):
+        os.makedirs(os.path.join(save_dir, exp_name))
 
     # Record train accuracy
     train_loss, train_acc = evaluate(x_train, y_train)
@@ -145,6 +148,10 @@ def train_model(config, gpu_id, save_dir, exp_name):
             # Takes one training step
             optimizer.step()
 
+            # Record weights L2 norm
+            weights_L2_norm = model.get_weights_L2_norm()
+            weights_tape.append(float(weights_L2_norm.data.cpu().numpy()))
+
         # Record train accuracy
         train_loss, train_acc = evaluate(x_train, y_train)
         train_tape[0].append(train_loss)
@@ -160,10 +167,6 @@ def train_model(config, gpu_id, save_dir, exp_name):
         test_tape[0].append(test_loss)
         test_tape[1].append(test_acc)
 
-        # Record weights L2 norm
-        weights_L2_norm = model.get_weights_L2_norm()
-        weights_tape.append(float(weights_L2_norm.data.cpu().numpy()))
-
         print("Epoch {0} \nLoss : {1:.3f} \nAcc : {2:.3f}".format(epoch, valid_loss, valid_acc))
         print("Time : {0:.2f}".format(time.time() - start))
 
@@ -172,9 +175,6 @@ def train_model(config, gpu_id, save_dir, exp_name):
             print("NEW BEST MODEL")
             torch.save(model.state_dict(), os.path.join(save_dir, exp_name, "model"))
             best_valid_acc = valid_acc
-
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
 
     # Saves the graphs
     utils.save_results(train_tape, valid_tape, test_tape, weights_tape, save_dir, exp_name, config)
